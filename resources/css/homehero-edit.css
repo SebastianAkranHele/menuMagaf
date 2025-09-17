@@ -1,0 +1,209 @@
+/* =============================
+   Hero Edit Page Styles
+   ============================= */
+.hero-edit-container {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+/* Form */
+.hero-edit-form {
+    flex: 1;
+    min-width: 320px;
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.hero-edit-form h4 {
+    margin-top: 1rem;
+    font-weight: 600;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: .4rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: .6rem .8rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: .95rem;
+}
+
+.btn {
+    padding: .6rem 1rem;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+}
+
+.btn-success {
+    background: #16a34a;
+    color: #fff;
+}
+
+.btn-success:hover {
+    background: #15803d;
+}
+
+.btn-remove-link {
+    display: inline-block;
+    margin-top: .4rem;
+    padding: .4rem .6rem;
+    font-size: .85rem;
+    background: #dc2626;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-remove-link:hover {
+    background: #b91c1c;
+}
+
+/* Social link item */
+.social-link-item {
+    border: 1px solid #e5e7eb;
+    padding: .8rem;
+    border-radius: 8px;
+    margin-bottom: .8rem;
+    background: #f9fafb;
+}
+/* =============================
+   Cores para Botões Sociais
+   ============================= */
+.facebook-color {
+    background: #1877f2; /* Azul Facebook */
+}
+
+.instagram-color {
+    background: radial-gradient(circle at 30% 107%,
+        #fdf497 0%, #fdf497 5%,
+        #fd5949 45%, #d6249f 60%,
+        #285AEB 90%);
+}
+
+.whatsapp-color {
+    background: #25d366; /* Verde WhatsApp */
+}
+
+.tiktok-color {
+    background: #010101; /* Preto TikTok */
+    position: relative;
+    overflow: hidden;
+}
+.tiktok-color::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, #25F4EE, #FE2C55);
+    mix-blend-mode: screen;
+    opacity: 0.6;
+}
+
+/* Preview */
+.hero-edit-preview {
+    flex: 1;
+    min-width: 320px;
+    background: #fff;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+#hero-preview {
+    position: relative;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    background-size: cover;
+    background-position: center;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+}
+
+#preview-profile {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+#preview-title {
+    font-size: 1.8rem;
+    color: #fff;
+    font-weight: 700;
+    text-shadow: 0 2px 6px rgba(0,0,0,.6);
+}
+
+#preview-subtitle {
+    font-size: 1rem;
+    color: #f3f4f6;
+    text-shadow: 0 1px 4px rgba(0,0,0,.6);
+}
+
+#preview-buttons {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .6rem;
+}
+
+#preview-buttons a {
+    padding: .6rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,.3);
+    transition: transform .2s;
+}
+
+#preview-buttons a:hover {
+    transform: translateY(-2px);
+}
+
+.no-buttons {
+    color: #e5e7eb;
+    font-style: italic;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .hero-edit-container {
+        flex-direction: column;
+    }
+}

@@ -2,7 +2,7 @@
 
 @section('content')
 <h2>Pedido #{{ $order->id }}</h2>
-<p>Status: {{ ucfirst($order->status) }}</p>
+<p>Status: <strong>{{ ucfirst($order->status) }}</strong></p>
 <p>Total: KZ {{ number_format($order->total, 2, ',', '.') }}</p>
 
 <h3>Produtos</h3>
@@ -27,9 +27,74 @@
     </tbody>
 </table>
 
-<form action="{{ route('admin.orders.complete', $order) }}" method="POST">
-    @csrf
-    <button class="btn btn-success">Marcar como concluído</button>
-</form>
-
+<div class="mt-3">
+    @if($order->status !== 'completed')
+        <form id="completeForm" action="{{ route('admin.orders.complete', $order) }}" method="POST" style="display:inline-block;">
+            @csrf
+            <button type="button" class="btn btn-success" id="completeBtn">Marcar como concluído</button>
+        </form>
+    @else
+        <form id="cancelCompleteForm" action="{{ route('admin.orders.cancelComplete', $order) }}" method="POST" style="display:inline-block;">
+            @csrf
+            <button type="button" class="btn btn-warning" id="cancelCompleteBtn">Cancelar conclusão</button>
+        </form>
+    @endif
+</div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // Botão concluir pedido
+    const completeBtn = document.getElementById('completeBtn');
+    if(completeBtn){
+        completeBtn.addEventListener('click', function(){
+            Swal.fire({
+                title: 'Tem certeza?',
+                text: "Deseja marcar este pedido como concluído?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, concluir',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if(result.isConfirmed){
+                    document.getElementById('completeForm').submit();
+                }
+            });
+        });
+    }
+
+    // Botão cancelar conclusão
+    const cancelBtn = document.getElementById('cancelCompleteBtn');
+    if(cancelBtn){
+        cancelBtn.addEventListener('click', function(){
+            Swal.fire({
+                title: 'Tem certeza?',
+                text: "Deseja cancelar a conclusão deste pedido?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, cancelar',
+                cancelButtonText: 'Manter concluído'
+            }).then((result) => {
+                if(result.isConfirmed){
+                    document.getElementById('cancelCompleteForm').submit();
+                }
+            });
+        });
+    }
+
+    // Mensagem de sucesso
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Sucesso!',
+            text: '{{ session('success') }}',
+            timer: 2000,
+            showConfirmButton: false
+        });
+    @endif
+});
+</script>
+@endpush

@@ -31,7 +31,8 @@
                             data-name="{{ $product->name }}"
                             data-description="{{ $product->description }}"
                             data-price="{{ $product->price }}"
-                            data-category="{{ $product->category_id }}">
+                            data-category="{{ $product->category_id }}"
+                            data-image="{{ $product->image ? asset('storage/'.$product->image) : '' }}">
                             <i class="fas fa-edit"></i> Editar
                         </button>
                         <button class="btn btn-danger btn-sm d-flex align-items-center gap-1 delete-product" data-id="{{ $product->id }}">
@@ -48,7 +49,7 @@
     </div>
 </div>
 
-@include('admin.products.modals') {{-- Inclua aqui os modais criar/editar --}}
+@include('admin.products.modals') {{-- Inclui modais criar/editar --}}
 
 @endsection
 
@@ -56,17 +57,111 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-@if(session('success'))
-    Swal.fire({
-        icon: 'success',
-        title: 'Sucesso!',
-        text: '{{ session('success') }}',
-        timer: 2000,
-        showConfirmButton: false
-    });
+// Variável para controlar se já mostramos um alerta
+let alertShown = false;
+
+/**
+ * Abrir modal de criação automaticamente se houver erro de duplicação
+ */
+@if(session('duplicate_create'))
+    var createModal = new bootstrap.Modal(document.getElementById('createProductModal'));
+    createModal.show();
 @endif
 
-// Modal Editar
+/**
+ * Função para mostrar alertas na ordem correta
+ */
+function showAlerts() {
+    if (alertShown) return;
+
+    // Primeiro verifica se há erro de duplicação na criação
+    @if(session('duplicate_create'))
+        alertShown = true;
+        Swal.fire({
+            title: 'Produto já existe!',
+            text: "Já existe um produto com o nome '{{ session('duplicate_create') }}'. Deseja continuar mesmo assim?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, continuar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('forceCreateInput').value = '1';
+                document.getElementById('createProductForm').submit();
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Cancelado',
+                    text: 'O produto não foi criado.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        });
+
+    // Depois verifica se há erro de duplicação na edição
+    @elseif(session('duplicate_update'))
+        alertShown = true;
+        Swal.fire({
+            title: 'Produto já existe!',
+            text: "Já existe um produto com o nome '{{ session('duplicate_update') }}'. Deseja continuar mesmo assim?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, continuar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                let form = document.getElementById('editProductForm');
+                form.action = "{{ route('admin.products.update', ['product' => '__id__']) }}"
+                              .replace('__id__', "{{ session('product_id') }}");
+
+                if (!form.querySelector('input[name="_method"]')) {
+                    let methodInput = document.createElement('input');
+                    methodInput.type = 'hidden';
+                    methodInput.name = '_method';
+                    methodInput.value = 'PUT';
+                    form.appendChild(methodInput);
+                }
+
+                let forceInput = document.createElement('input');
+                forceInput.type = 'hidden';
+                forceInput.name = 'force_update';
+                forceInput.value = '1';
+                form.appendChild(forceInput);
+
+                form.submit();
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Cancelado',
+                    text: 'A atualização foi cancelada.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        });
+
+    // Por último, mostra mensagem de sucesso (se não houver duplicação)
+    @elseif(session('success'))
+        alertShown = true;
+        Swal.fire({
+            icon: 'success',
+            title: 'Sucesso!',
+            text: '{{ session('success') }}',
+            timer: 2000,
+            showConfirmButton: false
+        });
+    @endif
+}
+
+// Executar quando o documento estiver pronto
+document.addEventListener('DOMContentLoaded', function() {
+    showAlerts();
+});
+
+/**
+ * Modal Editar (preenche os dados dinamicamente)
+ */
 var editModal = document.getElementById('editProductModal');
 editModal.addEventListener('show.bs.modal', function (event) {
     var button = event.relatedTarget;
@@ -74,10 +169,23 @@ editModal.addEventListener('show.bs.modal', function (event) {
     document.getElementById('editProductDescription').value = button.getAttribute('data-description');
     document.getElementById('editProductPrice').value = button.getAttribute('data-price');
     document.getElementById('editProductCategory').value = button.getAttribute('data-category');
-    document.getElementById('editProductForm').action = '/admin/products/' + button.getAttribute('data-id');
+
+    document.getElementById('editProductForm').action =
+        "{{ route('admin.products.update', ['product' => '__id__']) }}".replace('__id__', button.getAttribute('data-id'));
+
+    var preview = document.getElementById('editProductPreview');
+    var image = button.getAttribute('data-image');
+    if (image) {
+        preview.src = image;
+        preview.classList.remove('d-none');
+    } else {
+        preview.classList.add('d-none');
+    }
 });
 
-// Deletar produto
+/**
+ * Deletar Produto
+ */
 document.querySelectorAll('.delete-product').forEach(button => {
     button.addEventListener('click', function() {
         var productId = this.getAttribute('data-id');
@@ -95,7 +203,7 @@ document.querySelectorAll('.delete-product').forEach(button => {
             if (result.isConfirmed) {
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = '/admin/products/' + productId;
+                form.action = "{{ route('admin.products.destroy', ['product' => '__id__']) }}".replace('__id__', productId);
 
                 const token = document.createElement('input');
                 token.type = 'hidden';

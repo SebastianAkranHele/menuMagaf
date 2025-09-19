@@ -19,13 +19,6 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
-    // Cria slug automaticamente ao criar ou atualizar
-    protected static function booted()
-    {
-        static::saving(function ($product) {
-            $product->slug = Str::slug($product->name);
-        });
-    }
     public function orders()
     {
         return $this->belongsToMany(Order::class)
@@ -33,4 +26,19 @@ class Product extends Model
                     ->withTimestamps();
     }
 
+    // Gera slug único automaticamente ao criar ou atualizar
+    protected static function booted()
+    {
+        static::saving(function ($product) {
+            $baseSlug = Str::slug($product->name);
+
+            // Ignora o próprio produto no caso de update
+            $query = Product::where('slug', 'LIKE', "{$baseSlug}%")
+                            ->where('id', '!=', $product->id ?? 0);
+
+            $count = $query->count();
+
+            $product->slug = $count ? "{$baseSlug}-{$count}" : $baseSlug;
+        });
+    }
 }

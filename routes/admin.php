@@ -41,13 +41,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
         Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
-        // Pedidos
+                // Pedidos
         Route::get('orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('orders.index');
         Route::get('orders/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('orders.show');
+
         Route::post('orders/{order}/complete', [\App\Http\Controllers\Admin\OrderController::class, 'complete'])->name('orders.complete');
-        Route::post('orders/{order}/cancel-complete', [\App\Http\Controllers\Admin\OrderController::class, 'cancelComplete'])->name('orders.cancelComplete'); // nova rota
+        Route::post('orders/{order}/cancel', [\App\Http\Controllers\Admin\OrderController::class, 'cancel'])->name('orders.cancel');
+        Route::post('orders/{order}/restore-pending', [\App\Http\Controllers\Admin\OrderController::class, 'restorePending'])->name('orders.restorePending');
+
         Route::delete('orders/{order}', [\App\Http\Controllers\Admin\OrderController::class, 'destroy'])->name('orders.destroy');
+
+        // Exportar PDF (respeitando filtro de status)
         Route::get('orders/export/pdf', [\App\Http\Controllers\Admin\OrderController::class, 'exportPdf'])->name('orders.export.pdf');
+
 
 
     });

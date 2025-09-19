@@ -34,7 +34,7 @@
             <button type="button" class="btn btn-success" id="completeBtn">Marcar como concluído</button>
         </form>
     @else
-        <form id="cancelCompleteForm" action="{{ route('admin.orders.cancelComplete', $order) }}" method="POST" style="display:inline-block;">
+        <form id="cancelCompleteForm" action="{{ route('admin.orders.cancel', $order) }}" method="POST" style="display:inline-block;">
             @csrf
             <button type="button" class="btn btn-warning" id="cancelCompleteBtn">Cancelar conclusão</button>
         </form>

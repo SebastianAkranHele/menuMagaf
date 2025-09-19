@@ -11,13 +11,12 @@ class OrderController extends Controller
 {
     /**
      * Exibe todos os pedidos, com filtro opcional por status.
-     * Query string: ?status=pending ou ?status=completed
+     * Query string: ?status=pending|completed|canceled
      */
     public function index(Request $request)
     {
         $query = Order::with('products')->latest();
 
-        // Filtro opcional de status
         if ($request->has('status') && in_array($request->status, ['pending', 'completed', 'canceled'])) {
             $query->where('status', $request->status);
         }
@@ -48,14 +47,25 @@ class OrderController extends Controller
     }
 
     /**
-     * Cancela a conclusão do pedido
+     * Cancela (manda para cancelados)
      */
-    public function cancelComplete(Order $order)
+    public function cancel(Order $order)
+    {
+        $order->status = 'canceled';
+        $order->save();
+
+        return redirect()->back()->with('success', 'Pedido cancelado.');
+    }
+
+    /**
+     * Restaura um pedido cancelado para pendente
+     */
+    public function restorePending(Order $order)
     {
         $order->status = 'pending';
         $order->save();
 
-        return redirect()->back()->with('success', 'Conclusão do pedido cancelada.');
+        return redirect()->back()->with('success', 'Pedido movido para pendentes.');
     }
 
     /**
@@ -93,34 +103,45 @@ class OrderController extends Controller
         return redirect()->back()->with('success', 'Pedido deletado.');
     }
 
-//eXPOR pdf
-public function exportPdf()
-{
-    $orders = Order::latest()->get();
+    /**
+     * Exporta pedidos para PDF (respeitando filtro atual)
+     */
+    public function exportPdf(Request $request)
+    {
+        $status = $request->get('status'); // pending|completed|canceled|null
 
-    // Traduzir status para PT (caso ainda não uses o accessor)
-    $orders->transform(function ($order) {
-        switch ($order->status) {
-            case 'pending':
-                $order->status_pt = 'Pendente';
-                break;
-            case 'completed':
-                $order->status_pt = 'Concluído';
-                break;
-            case 'canceled':
-                $order->status_pt = 'Cancelado';
-                break;
-            default:
-                $order->status_pt = ucfirst($order->status);
-                break;
+        $query = Order::latest();
+
+        if ($status && in_array($status, ['pending', 'completed', 'canceled'])) {
+            $query->where('status', $status);
         }
-        return $order;
-    });
 
-    $pdf = Pdf::loadView('admin.orders.pdf', compact('orders'))
-              ->setPaper('a4', 'portrait');
+        $orders = $query->get();
 
-    return $pdf->download('pedidos.pdf');
-}
+        // Traduzir status
+        $orders->transform(function ($order) {
+            switch ($order->status) {
+                case 'pending':
+                    $order->status_pt = 'Pendente';
+                    break;
+                case 'completed':
+                    $order->status_pt = 'Concluído';
+                    break;
+                case 'canceled':
+                    $order->status_pt = 'Cancelado';
+                    break;
+                default:
+                    $order->status_pt = ucfirst($order->status);
+                    break;
+            }
+            return $order;
+        });
 
+        $pdf = Pdf::loadView('admin.orders.pdf', compact('orders'))
+                  ->setPaper('a4', 'portrait');
+
+        $fileName = $status ? "pedidos-{$status}.pdf" : "pedidos-todos.pdf";
+
+        return $pdf->download($fileName);
+    }
 }

@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Exports\OrdersExport;
+use App\Exports\OrderExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -144,4 +147,48 @@ class OrderController extends Controller
 
         return $pdf->download($fileName);
     }
+
+    /**
+ * Exporta um pedido específico para PDF (detalhes + produtos)
+ */
+public function exportSinglePdf(Order $order)
+{
+    $order->load('products');
+
+    $pdf = Pdf::loadView('admin.orders.pdf_single', compact('order'))
+              ->setPaper('a4', 'portrait');
+
+    return $pdf->download("pedido-{$order->id}.pdf");
+}
+
+public function exportOrderPdf(Order $order)
+{
+    $order->load('products');
+
+    $pdf = Pdf::loadView('admin.orders.invoice-pdf', compact('order'))
+              ->setPaper('a4'); // tamanho da página A4
+
+    return $pdf->download("fatura-pedido-{$order->id}.pdf");
+}
+
+public function exportExcel()
+{
+    return Excel::download(new OrdersExport, 'orders.xlsx');
+}
+
+public function exportCsv()
+{
+    return Excel::download(new OrdersExport, 'orders.csv');
+}
+
+public function exportSingleExcel(Order $order)
+{
+    return Excel::download(new \App\Exports\OrderExport($order), "pedido-{$order->id}.xlsx");
+}
+
+public function exportSingleCsv(Order $order)
+{
+    return Excel::download(new \App\Exports\OrderExport($order), "pedido-{$order->id}.csv");
+}
+
 }

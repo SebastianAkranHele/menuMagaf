@@ -8,6 +8,15 @@
         <i class="fas fa-file-pdf me-1"></i> Exportar PDF
     </a>
 </div>
+<div class="mb-3">
+    <a href="{{ route('admin.orders.export.excel') }}" class="btn btn-success">
+        📊 Exportar Excel
+    </a>
+    <a href="{{ route('admin.orders.export.csv') }}" class="btn btn-secondary">
+        📑 Exportar CSV
+    </a>
+</div>
+
 
 {{-- Filtros de status --}}
 <div class="mb-3">

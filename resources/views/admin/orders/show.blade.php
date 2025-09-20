@@ -28,6 +28,7 @@
 </table>
 
 <div class="mt-3">
+    {{-- Botões de ação de status --}}
     @if($order->status !== 'completed')
         <form id="completeForm" action="{{ route('admin.orders.complete', $order) }}" method="POST" style="display:inline-block;">
             @csrf
@@ -39,6 +40,21 @@
             <button type="button" class="btn btn-warning" id="cancelCompleteBtn">Cancelar conclusão</button>
         </form>
     @endif
+
+    {{-- Botões de Exportação --}}
+    <div class="mt-3">
+        <a href="{{ route('admin.orders.export.single', $order) }}" class="btn btn-danger">
+            <i class="fas fa-file-pdf me-1"></i> Exportar PDF
+        </a>
+
+        <a href="{{ route('admin.orders.export.single.excel', $order) }}" class="btn btn-success">
+            <i class="fas fa-file-excel me-1"></i> Exportar Excel
+        </a>
+
+        <a href="{{ route('admin.orders.export.single.csv', $order) }}" class="btn btn-secondary">
+            <i class="fas fa-file-csv me-1"></i> Exportar CSV
+        </a>
+    </div>
 </div>
 @endsection
 

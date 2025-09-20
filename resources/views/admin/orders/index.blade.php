@@ -8,15 +8,15 @@
         <i class="fas fa-file-pdf me-1"></i> Exportar PDF
     </a>
 </div>
+
 <div class="mb-3">
     <a href="{{ route('admin.orders.export.excel') }}" class="btn btn-success">
-        📊 Exportar Excel
+        📊 Exportar Excel (Todos)
     </a>
     <a href="{{ route('admin.orders.export.csv') }}" class="btn btn-secondary">
-        📑 Exportar CSV
+        📑 Exportar CSV (Todos)
     </a>
 </div>
-
 
 {{-- Filtros de status --}}
 <div class="mb-3">
@@ -64,11 +64,23 @@
             </td>
             <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
             <td>
+                {{-- Ver pedido --}}
                 <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-primary">
                     <i class="fas fa-eye"></i> Ver
                 </a>
 
-                {{-- Botões conforme status --}}
+                {{-- Exportações individuais --}}
+                <a href="{{ route('admin.orders.export.single', $order) }}" class="btn btn-sm btn-danger" title="Exportar PDF">
+                    <i class="fas fa-file-pdf"></i>
+                </a>
+                <a href="{{ route('admin.orders.export.single.excel', $order) }}" class="btn btn-sm btn-success" title="Exportar Excel">
+                    <i class="fas fa-file-excel"></i>
+                </a>
+                <a href="{{ route('admin.orders.export.single.csv', $order) }}" class="btn btn-sm btn-secondary" title="Exportar CSV">
+                    <i class="fas fa-file-csv"></i>
+                </a>
+
+                {{-- Botões de status --}}
                 @if($order->status === 'pending')
                     <form action="{{ route('admin.orders.complete', $order) }}" method="POST" class="d-inline-block">
                         @csrf
@@ -115,93 +127,57 @@
         @endforelse
     </tbody>
 </table>
+@endsection
 
 @push('scripts')
+{{-- Importa SweetAlert2 (se já não estiver no layout) --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Função genérica para confirmar ações
-        function confirmAction(event, message, successMessage) {
-            event.preventDefault();
-            const form = event.target.closest('form');
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".complete-order, .cancel-order, .restore-order, .delete-order")
+        .forEach(button => {
+            button.addEventListener("click", () => {
+                const form = button.closest("form");
+                let title = "Tem certeza?";
+                let text = "Esta ação não pode ser desfeita.";
+                let icon = "warning";
+                let confirmButton = "Sim, confirmar!";
 
-            Swal.fire({
-                title: 'Tem certeza?',
-                text: message,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sim, confirmar!',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Mostrar loading
-                    Swal.fire({
-                        title: 'Processando...',
-                        text: 'Aguarde um momento.',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading()
-                        }
-                    });
-
-                    // Enviar o formulário
-                    form.submit();
+                if (button.classList.contains("delete-order")) {
+                    title = "Deletar pedido?";
+                    text = "O pedido será removido permanentemente!";
+                    confirmButton = "Sim, deletar!";
+                } else if (button.classList.contains("cancel-order")) {
+                    title = "Cancelar pedido?";
+                    text = "O status será alterado para cancelado.";
+                    confirmButton = "Sim, cancelar!";
+                } else if (button.classList.contains("complete-order")) {
+                    title = "Concluir pedido?";
+                    text = "O status será alterado para concluído.";
+                    confirmButton = "Sim, concluir!";
+                } else if (button.classList.contains("restore-order")) {
+                    title = "Restaurar pedido?";
+                    text = "O status será alterado para pendente.";
+                    confirmButton = "Sim, restaurar!";
                 }
-            });
-        }
 
-        // Concluir pedido
-        document.querySelectorAll('.complete-order').forEach(button => {
-            button.addEventListener('click', (e) => {
-                confirmAction(e, 'Deseja marcar este pedido como concluído?', 'Pedido concluído com sucesso!');
+                Swal.fire({
+                    title: title,
+                    text: text,
+                    icon: icon,
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: confirmButton,
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
             });
         });
-
-        // Cancelar pedido
-        document.querySelectorAll('.cancel-order').forEach(button => {
-            button.addEventListener('click', (e) => {
-                confirmAction(e, 'Deseja cancelar este pedido?', 'Pedido cancelado com sucesso!');
-            });
-        });
-
-        // Restaurar pedido
-        document.querySelectorAll('.restore-order').forEach(button => {
-            button.addEventListener('click', (e) => {
-                confirmAction(e, 'Deseja restaurar este pedido para pendente?', 'Pedido restaurado com sucesso!');
-            });
-        });
-
-        // Deletar pedido
-        document.querySelectorAll('.delete-order').forEach(button => {
-            button.addEventListener('click', (e) => {
-                confirmAction(e, 'Deseja deletar permanentemente este pedido? Esta ação não pode ser desfeita.', 'Pedido deletado com sucesso!');
-            });
-        });
-
-        // Mensagens de sucesso do servidor
-        @if(session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'Sucesso!',
-                text: '{{ session('success') }}',
-                timer: 3000,
-                showConfirmButton: false
-            });
-        @endif
-
-        @if(session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro!',
-                text: '{{ session('error') }}',
-                timer: 3000,
-                showConfirmButton: false
-            });
-        @endif
-    });
+});
 </script>
 @endpush
-
-@endsection

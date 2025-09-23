@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\OrderExportController;
+use App\Http\Controllers\Admin\ReportController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     // ============================
@@ -82,5 +83,27 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('orders/{order}/export/product/{product}/pdf', [OrderExportController::class, 'exportProductPdf'])->name('orders.export.product.pdf');
         Route::get('orders/{order}/export/product/{product}/excel', [OrderExportController::class, 'exportProductExcel'])->name('orders.export.product.excel');
         Route::get('orders/{order}/export/product/{product}/csv', [OrderExportController::class, 'exportProductCsv'])->name('orders.export.product.csv');
+
+        // ============================
+        // Relatórios
+        // ============================
+        Route::prefix('reports')->name('reports.')->group(function () {
+            Route::get('/', [ReportController::class, 'index'])->name('index');
+            Route::get('/products', [ReportController::class, 'products'])->name('products');
+            Route::get('/export/csv', [ReportController::class, 'exportCsv'])->name('export.csv');
+            Route::get('/export/pdf', [ReportController::class, 'exportPdf'])->name('export.pdf');
+
+            // Exportar PDF de um pedido específico
+            Route::get('/export/pdf/{order}', [ReportController::class, 'exportSinglePdf'])
+                ->name('export.pdf.single');
+
+            // Opcional: exportar Excel ou CSV de um pedido específico
+            Route::get('/export/excel/{order}', [ReportController::class, 'exportSingleExcel'])
+                ->name('export.excel.single');
+
+            Route::get('/export/csv/{order}', [ReportController::class, 'exportSingleCsv'])
+                ->name('export.csv.single');
+
+         });
     });
 });

@@ -31,6 +31,12 @@ class RouteServiceProvider extends ServiceProvider
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
 
+                // Adicione esta linha para carregar admin.php
+            Route::middleware('web')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/admin.php'));
+
+
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
         });

@@ -23,7 +23,7 @@
     <!-- Cabeçalho -->
     <div class="header">
         {{-- Se tiver logo --}}
-        {{-- <img src="{{ public_path('images/logo.png') }}" alt="Logo"> --}}
+         <img src="{{ public_path('/assets/magaf1.jpg') }}" alt="Logo">
         <h1>Garrafeira das 5 Curvas</h1>
         <p>Luanda - Angola | Tel: +244 936 351 564</p>
         <p><strong>FATURA</strong></p>

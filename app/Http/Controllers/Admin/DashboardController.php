@@ -22,7 +22,14 @@ class DashboardController extends Controller
         $totalVisits = 0; // se tiver sistema de analytics, colocar aqui
 
         // =====================
-        // 2. Dados dos gráficos
+        // 2. Resumo de pedidos
+        // =====================
+        $ordersCompleted = Order::where('status', 'completed')->count();
+        $ordersPending   = Order::where('status', 'pending')->count();
+        $ordersCanceled  = Order::where('status', 'canceled')->count();
+
+        // =====================
+        // 3. Dados dos gráficos
         // =====================
 
         // Visitas últimos 7 dias (exemplo random, substituir com real)
@@ -61,6 +68,9 @@ class DashboardController extends Controller
             'totalCategories',
             'ordersToday',
             'totalVisits',
+            'ordersCompleted',
+            'ordersPending',
+            'ordersCanceled',
             'visitsWeekLabels',
             'visitsWeekData',
             'ordersByCategoryLabels',

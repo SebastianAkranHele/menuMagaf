@@ -18,10 +18,10 @@
         </header>
 
         <main>
-            <!-- Hero -->
-                <section class="hero" style="{{ $hero->background_image ? 'background: linear-gradient(rgba(58,45,40,0.8), rgba(58,45,40,0.8)), url('.asset('storage/'.$hero->background_image).') no-repeat center center/cover;' : '' }}">
-                    
-                </section>
+<section class="hero" style="{{ $hero->background_image ? 'background: url('.asset('storage/'.$hero->background_image).') no-repeat center center; background-size: cover; background-position: center; height: 100vh;' : '' }}">
+</section>
+
+
 
 
             <!-- Profile -->

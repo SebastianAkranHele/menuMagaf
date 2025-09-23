@@ -21,10 +21,33 @@
             <h3>Pedidos Hoje</h3>
             <p class="card-value">{{ $ordersToday ?? 0 }}</p>
         </div>
-        <div class="card summary-card bg-red">
-            <h3>Visitas</h3>
-            <p class="card-value">{{ $totalVisits ?? 0 }}</p>
-        </div>
+    </div>
+
+    <!-- Lista de Pedidos por Status -->
+    <div class="orders-list">
+        <h3>Resumo de Pedidos</h3>
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>Status</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="status completed">✔ Concluídos</span></td>
+                    <td>{{ $ordersCompleted ?? 0 }}</td>
+                </tr>
+                <tr>
+                    <td><span class="status pending">⏳ Pendentes</span></td>
+                    <td>{{ $ordersPending ?? 0 }}</td>
+                </tr>
+                <tr>
+                    <td><span class="status canceled">❌ Cancelados</span></td>
+                    <td>{{ $ordersCanceled ?? 0 }}</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <!-- Gráficos -->
@@ -53,12 +76,35 @@
 </div>
 
 <style>
+/* Cards */
 .dashboard-cards { display: flex; flex-wrap: wrap; gap: 1rem; }
-.dashboard-cards .card { flex: 1 1 calc(25% - 1rem); min-width: 200px; }
+.dashboard-cards .card { flex: 1 1 calc(25% - 1rem); min-width: 200px; padding:1rem; border-radius:8px; color:#fff; }
+.bg-red { background:#db0505; }
+.bg-dark-red { background:#a73406; }
+.bg-bright-red { background:#f00505; }
+.card-value { font-size:2rem; font-weight:bold; }
+
+/* Lista/Tabela de pedidos */
+.orders-list { background:#fff; margin-top:2rem; padding:1rem; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+.orders-table { width:100%; border-collapse:collapse; }
+.orders-table th, .orders-table td { padding:0.75rem; text-align:left; border-bottom:1px solid #eee; }
+.status { padding:0.25rem 0.5rem; border-radius:4px; font-size:0.9rem; }
+.status.completed { background:#28a745; color:#fff; }
+.status.pending { background:#ffc107; color:#000; }
+.status.canceled { background:#dc3545; color:#fff; }
+
+/* Gráficos */
 .dashboard-graphs { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 2rem; }
 .dashboard-graphs .graph-card { flex: 1 1 calc(50% - 1rem); min-width: 300px; background: #fff; border-radius: 8px; padding: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-@media (max-width: 1024px) { .dashboard-cards .card { flex: 1 1 calc(50% - 1rem); } .dashboard-graphs .graph-card { flex: 1 1 100%; } }
-@media (max-width: 600px) { .dashboard-cards .card { flex: 1 1 100%; } }
+
+/* Responsividade */
+@media (max-width: 1024px) {
+    .dashboard-cards .card { flex: 1 1 calc(50% - 1rem); }
+    .dashboard-graphs .graph-card { flex: 1 1 100%; }
+}
+@media (max-width: 600px) {
+    .dashboard-cards .card { flex: 1 1 100%; }
+}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

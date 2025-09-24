@@ -14,6 +14,7 @@ class ProductController extends Controller
             return [
                 'id' => $prod->id,
                 'name' => $prod->name,
+                'stock' => 'required|integer|min:0', // ADICIONAR
                 'description' => $prod->description,
                 'price' => $prod->price,
                 'image' => $prod->image,

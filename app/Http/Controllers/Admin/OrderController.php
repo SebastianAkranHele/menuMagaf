@@ -64,7 +64,8 @@ class OrderController extends Controller
     public function destroy(Order $order)
     {
         $order->delete();
-        return back()->with('success', 'Pedido deletado.');
+        return redirect()->back()->with('success', 'Pedido deletado com sucesso!');
+
     }
 
     /**

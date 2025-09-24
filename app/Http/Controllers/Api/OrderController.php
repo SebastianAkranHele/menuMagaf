@@ -12,6 +12,7 @@ class OrderController extends Controller
     {
         $request->validate([
             'customer_name' => 'required|string|max:255',
+            'customer_table' => 'nullable|string|max:50',
             'total' => 'required|numeric',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
@@ -19,14 +20,13 @@ class OrderController extends Controller
             'items.*.price' => 'required|numeric|min:0',
         ]);
 
-
         $order = Order::create([
             'user_id' => null,
             'customer_name' => $request->customer_name,
+            'customer_table' => $request->customer_table, // 👈 novo
             'total' => $request->total,
             'status' => 'pending',
         ]);
-
 
         foreach ($request->items as $item) {
             $order->products()->attach($item['product_id'], [

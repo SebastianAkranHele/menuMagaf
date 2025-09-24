@@ -22,7 +22,6 @@
 
     <!-- Cabeçalho -->
     <div class="header">
-        {{-- Se tiver logo --}}
          <img src="{{ public_path('/assets/magaf1.jpg') }}" alt="Logo">
         <h1>Garrafeira das 5 Curvas</h1>
         <p>Luanda - Angola | Tel: +244 936 351 564</p>
@@ -32,11 +31,17 @@
     <!-- Informações -->
     <div class="info">
         <p><strong>Pedido #:</strong> {{ $order->id }}</p>
-        <p><strong>Status:</strong> {{ ucfirst($order->status) }}</p>
+        <p><strong>Status:</strong> {{ $order->status_label }}</p>
         <p><strong>Data:</strong> {{ $order->created_at->format('d/m/Y H:i') }}</p>
 
+        {{-- Cliente vindo do pedido --}}
+        <p><strong>Cliente:</strong> {{ $order->customer_name ?? ($order->user->name ?? 'Cliente Desconhecido') }}</p>
+
+        {{-- Mesa --}}
+        <p><strong>Mesa:</strong> {{ $order->customer_table ?? '-' }}</p>
+
+        {{-- Caso tenha usuário vinculado --}}
         @if($order->user)
-            <p><strong>Cliente:</strong> {{ $order->user->name }}</p>
             <p><strong>Email:</strong> {{ $order->user->email }}</p>
         @endif
     </div>

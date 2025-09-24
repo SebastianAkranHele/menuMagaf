@@ -40,7 +40,7 @@
                     <td>#{{ $order->id }}</td>
                     <td>{{ $order->customer_name ?? 'Cliente Desconhecido' }}</td>
                     <td>KZ {{ number_format($order->total,2,',','.') }}</td>
-                    <td>{{ ucfirst($order->status) }}</td>
+                    <td><span class="badge bg-{{ $order->status }}"> {{ $order->status_label }}</span></td>
                     <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
                     <td>
                         @foreach($order->products as $p)

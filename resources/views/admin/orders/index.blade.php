@@ -131,41 +131,47 @@
 
 @push('scripts')
 {{-- Importa SweetAlert2 (se já não estiver no layout) --}}
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".complete-order, .cancel-order, .restore-order, .delete-order")
         .forEach(button => {
-            button.addEventListener("click", () => {
+            button.addEventListener("click", (e) => {
+                e.preventDefault(); // evita envio imediato
                 const form = button.closest("form");
+
                 let title = "Tem certeza?";
                 let text = "Esta ação não pode ser desfeita.";
-                let icon = "warning";
                 let confirmButton = "Sim, confirmar!";
+                let successMessage = "Ação realizada com sucesso!";
 
                 if (button.classList.contains("delete-order")) {
                     title = "Deletar pedido?";
                     text = "O pedido será removido permanentemente!";
                     confirmButton = "Sim, deletar!";
+                    successMessage = "Pedido deletado com sucesso!";
                 } else if (button.classList.contains("cancel-order")) {
                     title = "Cancelar pedido?";
                     text = "O status será alterado para cancelado.";
                     confirmButton = "Sim, cancelar!";
+                    successMessage = "Pedido cancelado com sucesso!";
                 } else if (button.classList.contains("complete-order")) {
                     title = "Concluir pedido?";
                     text = "O status será alterado para concluído.";
                     confirmButton = "Sim, concluir!";
+                    successMessage = "Pedido concluído com sucesso!";
                 } else if (button.classList.contains("restore-order")) {
                     title = "Restaurar pedido?";
                     text = "O status será alterado para pendente.";
                     confirmButton = "Sim, restaurar!";
+                    successMessage = "Pedido restaurado com sucesso!";
                 }
 
                 Swal.fire({
                     title: title,
                     text: text,
-                    icon: icon,
+                    icon: "warning",
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
@@ -173,11 +179,22 @@ document.addEventListener("DOMContentLoaded", () => {
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        form.submit();
+                        form.submit(); // envia o formulário
+                        // mostra SweetAlert de sucesso antes de recarregar
+                        Swal.fire({
+                            title: 'Sucesso!',
+                            text: successMessage,
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload(); // atualiza a página para refletir mudanças
+                        });
                     }
                 });
             });
         });
 });
 </script>
+
 @endpush

@@ -36,7 +36,7 @@
             <li><a href="{{ route('admin.categories.index') }}" class="nav-link">Categorias</a></li>
             <li><a href="{{ route('admin.products.index') }}" class="nav-link">Produtos</a></li>
             <li><a href="{{ route('admin.orders.index') }}" class="nav-link">Pedidos</a></li>
-             <li><a href="{{ route('admin.reports.index') }}" class="nav-link">relatorios</a></li>
+             <li><a href="{{ route('admin.reports.index') }}" class="nav-link">Relatorios</a></li>
 
         </ul>
     </div>

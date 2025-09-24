@@ -13,7 +13,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\OrderExport;
 
-
 class ReportController extends Controller
 {
     /**
@@ -54,16 +53,19 @@ class ReportController extends Controller
         $topProducts = Product::select(
                 'products.id',
                 'products.name',
+                'products.cost',
                 DB::raw('SUM(order_product.quantity) as qty_sold'),
                 DB::raw('SUM(order_product.quantity * order_product.price) as revenue')
             )
             ->join('order_product', 'products.id', '=', 'order_product.product_id')
             ->join('orders', 'orders.id', '=', 'order_product.order_id')
             ->whereBetween('orders.created_at', [$start, $end])
-            ->groupBy('products.id', 'products.name')
+            ->groupBy('products.id', 'products.name', 'products.cost')
             ->orderByDesc('qty_sold')
             ->limit(10)
             ->get();
+
+        $totalProfit = $topProducts->sum(fn($p) => ($p->revenue ?? 0) - ($p->cost ?? 0) * ($p->qty_sold ?? 0));
 
         // Top categorias
         $topCategories = Category::select(
@@ -110,15 +112,30 @@ class ReportController extends Controller
         // Produtos nunca vendidos
         $neverSold = Product::whereDoesntHave('orders')->take(10)->get();
 
-        // Últimos pedidos (sem eager load de user)
+        // Últimos pedidos
         $recentOrders = Order::latest()->take(10)->get();
 
+        // Clientes frequentes
+        $frequentCustomers = Order::select('customer_name', DB::raw('COUNT(*) as orders_count'))
+            ->groupBy('customer_name')
+            ->having('orders_count', '>', 3)
+            ->get();
+
+        // Pagamentos
+       // $paymentsStats = Order::select('payment_method', DB::raw('COUNT(*) as total_orders'), DB::raw('SUM(total) as total_revenue'))
+          //  ->groupBy('payment_method')
+          //  ->get();
+
+        // Horário e dia de pico
+        $peakHour = array_search(max($ordersByHour), $ordersByHour);
+        $peakDay  = array_search(max($dayCounts), $dayCounts);
+
         return view('admin.reports.index', compact(
-            'start', 'end',
-            'totalOrders', 'totalRevenue', 'avgTicket', 'ordersByStatus',
-            'topProducts', 'topCategories', 'ordersByHour', 'hours',
-            'days', 'dayCounts', 'neverSold', 'recentOrders'
+            'start','end','totalOrders','totalRevenue','avgTicket','totalProfit','ordersByStatus',
+            'topProducts','topCategories','ordersByHour','hours',
+            'days','dayCounts','neverSold','recentOrders','frequentCustomers','peakHour','peakDay'
         ));
+
     }
 
     /**
@@ -159,8 +176,7 @@ class ReportController extends Controller
         $lowStock = Product::where('stock', '<', 5)->orderBy('stock')->get();
 
         return view('admin.reports.products', compact(
-            'start', 'end',
-            'topProducts', 'neverSold', 'categories', 'lowStock'
+            'start','end','topProducts','neverSold','categories','lowStock'
         ));
     }
 
@@ -171,7 +187,7 @@ class ReportController extends Controller
     {
         [$start, $end] = $this->getDateRange($request);
 
-        $orders = Order::with('products') // removido 'user'
+        $orders = Order::with('products')
             ->whereBetween('created_at', [$start, $end])
             ->orderBy('created_at')
             ->get();
@@ -187,15 +203,11 @@ class ReportController extends Controller
             $handle = fopen('php://output', 'w');
             fputcsv($handle, ['ID','Cliente','Total','Status','Data','Itens']);
             foreach ($orders as $order) {
-                $items = $order->products->map(function ($p) {
-                    $qty = $p->pivot->quantity ?? 1;
-                    $price = $p->pivot->price ?? $p->price ?? 0;
-                    return "{$p->name} (x{$qty} @ {$price})";
-                })->implode(' | ');
+                $items = $order->products->map(fn($p) => "{$p->name} (x{$p->pivot->quantity} @ {$p->pivot->price})")->implode(' | ');
 
                 fputcsv($handle, [
                     $order->id,
-                    $order->customer_name ?? 'N/A', // sem user
+                    $order->customer_name ?? 'N/A',
                     $order->total,
                     $order->status,
                     $order->created_at->format('Y-m-d H:i:s'),
@@ -215,7 +227,7 @@ class ReportController extends Controller
     {
         [$start, $end] = $this->getDateRange($request);
 
-        $orders = Order::with('products') // removido 'user'
+        $orders = Order::with('products')
             ->whereBetween('created_at', [$start, $end])
             ->orderBy('created_at')
             ->get();
@@ -232,37 +244,36 @@ class ReportController extends Controller
     }
 
     // Exportar PDF de um pedido específico
-public function exportPdfSingle(Order $order)
-{
-    $pdf = Pdf::loadView('admin.reports.pdf_single', compact('order'));
-    return $pdf->download("pedido_{$order->id}.pdf");
-}
+    public function exportPdfSingle(Order $order)
+    {
+        $pdf = Pdf::loadView('admin.reports.pdf_single', compact('order'));
+        return $pdf->download("pedido_{$order->id}.pdf");
+    }
 
-// Exportar CSV de um pedido específico
-public function exportCsvSingle(Order $order)
-{
-    $filename = "pedido_{$order->id}.csv";
-    $headers = [
-        'Content-Type' => 'text/csv',
-        'Content-Disposition' => "attachment; filename={$filename}",
-    ];
+    // Exportar CSV de um pedido específico
+    public function exportCsvSingle(Order $order)
+    {
+        $filename = "pedido_{$order->id}.csv";
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename={$filename}",
+        ];
 
-    $callback = function() use ($order) {
-        $handle = fopen('php://output', 'w');
-        fputcsv($handle, ['Produto','Quantidade','Preço']);
-        foreach($order->products as $p){
-            fputcsv($handle, [$p->name, $p->pivot->quantity, $p->pivot->price]);
-        }
-        fclose($handle);
-    };
+        $callback = function() use ($order) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Produto','Quantidade','Preço']);
+            foreach($order->products as $p){
+                fputcsv($handle, [$p->name, $p->pivot->quantity, $p->pivot->price]);
+            }
+            fclose($handle);
+        };
 
-    return response()->stream($callback, 200, $headers);
-}
+        return response()->stream($callback, 200, $headers);
+    }
 
-// Exportar Excel de um pedido específico (usando Maatwebsite Excel)
-public function exportExcelSingle(Order $order)
-{
-    return Excel::download(new OrderExport($order), "pedido_{$order->id}.xlsx");
-}
-
+    // Exportar Excel de um pedido específico
+    public function exportExcelSingle(Order $order)
+    {
+        return Excel::download(new OrderExport($order), "pedido_{$order->id}.xlsx");
+    }
 }

@@ -1,7 +1,14 @@
 @extends('admin.layout')
 
 @section('content')
-<h2>Pedido #{{ $order->id }}</h2>
+
+<div class="mb-3 d-flex align-items-center gap-2">
+    <a href="{{ route('admin.orders.index') }}" class="btn btn-primary">
+        <i class="fas fa-arrow-left me-1"></i> Voltar
+    </a>
+    <h2 class="mb-0">Pedido #{{ $order->id }}</h2>
+</div>
+
 <p>Status: <strong>{{ ucfirst($order->status) }}</strong></p>
 <p>Total: KZ {{ number_format($order->total, 2, ',', '.') }}</p>
 
@@ -55,4 +62,5 @@
         <i class="fas fa-file-csv me-1"></i> Exportar Pedido CSV
     </a>
 </div>
+
 @endsection

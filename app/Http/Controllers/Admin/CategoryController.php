@@ -46,9 +46,14 @@ class CategoryController extends Controller
         return redirect()->route('admin.categories.index')->with('success', 'Categoria atualizada com sucesso!');
     }
 
-    // Deleta categoria
+    // Deleta categoria (verificando vinculação a produtos)
     public function destroy(Category $category)
     {
+        if ($category->products()->count() > 0) {
+            return redirect()->route('admin.categories.index')
+                ->with('error', 'Não é possível deletar uma categoria que possui produtos vinculados.');
+        }
+
         $category->delete();
 
         return redirect()->route('admin.categories.index')->with('success', 'Categoria deletada com sucesso!');

@@ -1,11 +1,11 @@
 @extends('admin.layout')
 
 @section('content')
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <h2><i class="fas fa-chart-line me-2"></i>Relatórios</h2>
 
         {{-- Botões de exportação geral --}}
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 flex-wrap">
             <a href="{{ route('admin.reports.export.csv', request()->only(['start_date', 'end_date'])) }}"
                 class="btn btn-secondary">
                 <i class="fas fa-file-csv me-1"></i> CSV
@@ -16,13 +16,13 @@
             </a>
             <a href="{{ route('admin.reports.products', request()->only(['start_date', 'end_date'])) }}"
                 class="btn btn-danger">
-                <i class="fas fa-file-pdf me-1"></i> Productos
+                <i class="fas fa-file-pdf me-1"></i> Produtos
             </a>
         </div>
     </div>
 
     {{-- Filtros de datas --}}
-    <form method="GET" action="{{ route('admin.reports.index') }}" class="d-flex gap-2 align-items-end mb-3">
+    <form method="GET" action="{{ route('admin.reports.index') }}" class="d-flex flex-wrap gap-2 align-items-end mb-3">
         <div class="form-group">
             <label>De:</label>
             <input type="date" name="start_date" class="form-control"
@@ -51,7 +51,7 @@
         </div>
         <div class="card text-center p-3 flex-fill">
             <h5>Pedidos por Status</h5>
-            <div class="d-flex justify-content-center gap-2 flex-wrap">
+            <div class="d-flex justify-content-center flex-wrap gap-1 mt-2">
                 @foreach ($ordersByStatus as $status => $count)
                     @php
                         $color = match ($status) {
@@ -60,7 +60,6 @@
                             'canceled' => 'danger',
                             default => 'secondary',
                         };
-
                         $statusLabel = match ($status) {
                             'pending' => 'Pendente',
                             'completed' => 'Concluído',
@@ -68,22 +67,19 @@
                             default => ucfirst($status),
                         };
                     @endphp
-
-                    <span class="badge bg-{{ $color }} p-2">
-                        {{ $statusLabel }}: {{ $count }}
-                    </span>
+                    <span class="badge bg-{{ $color }} p-2">{{ $statusLabel }}: {{ $count }}</span>
                 @endforeach
-
             </div>
         </div>
     </div>
 
     {{-- Top Produtos e Categorias --}}
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <div class="card p-3">
-                <h5>Top Produtos (Qtd)</h5>
-                <table class="table table-striped">
+   <div class="row mb-3 g-3">
+    <div class="col-12 col-md-6 d-flex">
+        <div class="card p-3 flex-fill d-flex flex-column h-100">
+            <h5>Top Produtos (Qtd)</h5>
+            <div class="table-responsive flex-fill">
+                <table class="table table-striped mb-0">
                     <thead>
                         <tr>
                             <th>Produto</th>
@@ -103,10 +99,13 @@
                 </table>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card p-3">
-                <h5>Top Categorias</h5>
-                <table class="table table-striped">
+    </div>
+
+    <div class="col-12 col-md-6 d-flex">
+        <div class="card p-3 flex-fill d-flex flex-column h-100">
+            <h5>Top Categorias</h5>
+            <div class="table-responsive flex-fill">
+                <table class="table table-striped mb-0">
                     <thead>
                         <tr>
                             <th>Categoria</th>
@@ -125,74 +124,77 @@
             </div>
         </div>
     </div>
+</div>
+
 
     {{-- Gráficos --}}
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <div class="card p-3 bg-white shadow-sm" style="border: 2px solid #dc3545; border-radius: 0.5rem;">
-                <h5>Vendas por Dia</h5>
-                <canvas id="salesByDay"></canvas>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card p-3 bg-white shadow-sm" style="border: 2px solid #dc3545; border-radius: 0.5rem;">
-                <h5>Pedidos por Hora</h5>
-                <canvas id="ordersByHour"></canvas>
-            </div>
+     {{-- Gráficos --}}
+    <div class="row mb-3 g-3">
+    <div class="col-12 col-md-6 d-flex">
+        <div class="card flex-fill p-3 h-100 shadow-sm bg-white" style="border: 1px solid #dee2e6; border-radius:0.5rem;">
+            <h5>Vendas por Dia</h5>
+            <canvas id="salesByDay" style="min-height:200px;"></canvas>
         </div>
     </div>
-
-
+    <div class="col-12 col-md-6 d-flex">
+        <div class="card flex-fill p-3 h-100 shadow-sm bg-white" style="border: 1px solid #dee2e6; border-radius:0.5rem;">
+            <h5>Pedidos por Hora</h5>
+            <canvas id="ordersByHour" style="min-height:200px;"></canvas>
+        </div>
+    </div>
+</div>
 
     {{-- Produtos nunca vendidos --}}
     <div class="card p-3 mb-3">
         <h5>Produtos nunca vendidos</h5>
-        @forelse($neverSold as $prod)
-            <span class="badge bg-secondary me-1 mb-1">{{ $prod->name }}</span>
-        @empty
-            <p>Nenhum</p>
-        @endforelse
+        <div class="d-flex flex-wrap gap-1">
+            @forelse($neverSold as $prod)
+                <span class="badge bg-secondary">{{ $prod->name }}</span>
+            @empty
+                <p>Nenhum</p>
+            @endforelse
+        </div>
     </div>
 
     {{-- Últimos Pedidos --}}
-    <div class="card p-3">
+    <div class="card p-3 mb-3">
         <h5>Últimos Pedidos</h5>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Cliente</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Data</th>
-                    
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($recentOrders as $order)
-                    @php
-                        $color = match ($order->status) {
-                            'pending' => 'warning',
-                            'completed' => 'success',
-                            'canceled' => 'danger',
-                            default => 'secondary',
-                        };
-                    @endphp
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <thead>
                     <tr>
-                        <td>#{{ $order->id }}</td>
-                        <td>{{ $order->customer_name ?? ($order->user->name ?? 'Cliente Desconhecido') }}</td>
-                        <td>KZ {{ number_format($order->total, 2, ',', '.') }}</td>
-                        <td><span class="badge bg-{{ $color }}">{{ $order->status_label }}</span></td>
-                        <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
-
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Data</th>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="text-center">Nenhum pedido</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @forelse($recentOrders as $order)
+                        @php
+                            $color = match ($order->status) {
+                                'pending' => 'warning',
+                                'completed' => 'success',
+                                'canceled' => 'danger',
+                                default => 'secondary',
+                            };
+                        @endphp
+                        <tr>
+                            <td>#{{ $order->id }}</td>
+                            <td>{{ $order->customer_name ?? ($order->user->name ?? 'Cliente Desconhecido') }}</td>
+                            <td>KZ {{ number_format($order->total, 2, ',', '.') }}</td>
+                            <td><span class="badge bg-{{ $color }}">{{ $order->status_label }}</span></td>
+                            <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-center">Nenhum pedido</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 @endsection
 
@@ -204,39 +206,16 @@
         const hours = @json($hours);
         const ordersByHour = @json($ordersByHour);
 
-        // Gráfico de vendas por dia
         new Chart(document.getElementById('salesByDay'), {
             type: 'line',
-            data: {
-                labels: days,
-                datasets: [{
-                    label: 'Pedidos por dia',
-                    data: dayCounts,
-                    tension: 0.3,
-                    borderColor: '#db0505',
-                    backgroundColor: 'rgba(219,5,5,0.1)',
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true
-            }
+            data: { labels: days, datasets: [{ label: 'Pedidos por dia', data: dayCounts, tension: 0.3, borderColor: '#db0505', backgroundColor: 'rgba(219,5,5,0.1)', fill: true }] },
+            options: { responsive: true }
         });
 
-        // Gráfico de pedidos por hora
         new Chart(document.getElementById('ordersByHour'), {
             type: 'bar',
-            data: {
-                labels: hours,
-                datasets: [{
-                    label: 'Pedidos',
-                    data: ordersByHour,
-                    backgroundColor: '#a73406'
-                }]
-            },
-            options: {
-                responsive: true
-            }
+            data: { labels: hours, datasets: [{ label: 'Pedidos', data: ordersByHour, backgroundColor: '#a73406' }] },
+            options: { responsive: true }
         });
     </script>
 @endpush

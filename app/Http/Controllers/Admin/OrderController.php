@@ -17,16 +17,18 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Order::with('products')->latest();
+        $query = Order::query();
 
-        if ($request->has('status') && in_array($request->status, ['pending', 'completed', 'canceled'])) {
+        // Filtrar por status, se existir
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        $orders = $query->get();
+        $orders = $query->latest()->paginate(10); // pega os últimos 25 pedidos
 
         return view('admin.orders.index', compact('orders'));
     }
+
 
     /**
      * Mostra detalhes de um pedido
@@ -65,7 +67,6 @@ class OrderController extends Controller
     {
         $order->delete();
         return redirect()->back()->with('success', 'Pedido deletado com sucesso!');
-
     }
 
     /**
@@ -94,7 +95,7 @@ class OrderController extends Controller
         });
 
         $pdf = Pdf::loadView('admin.orders.pdf', compact('orders'))
-                  ->setPaper('a4', 'portrait');
+            ->setPaper('a4', 'portrait');
 
         $fileName = $status ? "pedidos-{$status}.pdf" : "pedidos-todos.pdf";
         return $pdf->download($fileName);
@@ -108,7 +109,7 @@ class OrderController extends Controller
         $order->load('products');
 
         $pdf = Pdf::loadView('admin.orders.pdf_single', compact('order'))
-                  ->setPaper('a4', 'portrait');
+            ->setPaper('a4', 'portrait');
 
         return $pdf->download("pedido-{$order->id}.pdf");
     }
@@ -121,7 +122,7 @@ class OrderController extends Controller
         $order->load('products');
 
         $pdf = Pdf::loadView('admin.orders.invoice-pdf', compact('order'))
-                  ->setPaper('a4');
+            ->setPaper('a4');
 
         return $pdf->download("fatura-pedido-{$order->id}.pdf");
     }

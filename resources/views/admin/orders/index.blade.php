@@ -127,18 +127,23 @@
         @endforelse
     </tbody>
 </table>
+
+{{-- Paginação --}}
+<div class="d-flex justify-content-center mt-3">
+   {{ $orders->withQueryString()->links('pagination::bootstrap-5') }}
+
+</div>
 @endsection
 
 @push('scripts')
-{{-- Importa SweetAlert2 (se já não estiver no layout) --}}
-<<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".complete-order, .cancel-order, .restore-order, .delete-order")
         .forEach(button => {
             button.addEventListener("click", (e) => {
-                e.preventDefault(); // evita envio imediato
+                e.preventDefault();
                 const form = button.closest("form");
 
                 let title = "Tem certeza?";
@@ -179,22 +184,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        form.submit(); // envia o formulário
-                        // mostra SweetAlert de sucesso antes de recarregar
-                        Swal.fire({
-                            title: 'Sucesso!',
-                            text: successMessage,
-                            icon: 'success',
-                            timer: 1500,
-                            showConfirmButton: false
-                        }).then(() => {
-                            location.reload(); // atualiza a página para refletir mudanças
-                        });
+                        form.submit();
                     }
                 });
             });
         });
 });
 </script>
-
 @endpush

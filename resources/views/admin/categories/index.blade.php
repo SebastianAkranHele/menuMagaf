@@ -64,6 +64,17 @@
         });
     @endif
 
+    // SweetAlert para erro (categoria com produtos vinculados)
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro!',
+            text: '{{ session('error') }}',
+            timer: 2500,
+            showConfirmButton: false
+        });
+    @endif
+
     // Modal Editar
     var editModal = document.getElementById('editCategoryModal');
     editModal.addEventListener('show.bs.modal', function (event) {
@@ -112,3 +123,5 @@
     });
 </script>
 @endpush
+
+

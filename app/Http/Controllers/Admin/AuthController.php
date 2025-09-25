@@ -15,19 +15,23 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        // Validação básica
         $credentials = $request->validate([
             'username' => 'required',
             'password' => 'required',
         ]);
 
+        // Tentativa de login
         if (Auth::guard('admin')->attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
-            return redirect()->intended(route('admin.dashboard'));
+
+            // Mensagem de sucesso para SweetAlert
+            return redirect()->intended(route('admin.dashboard'))
+                             ->with('success', 'Bem-vindo(a) à área administrativa!');
         }
 
-        return back()->withErrors([
-            'username' => 'Credenciais inválidas.',
-        ]);
+        // Mensagem genérica para qualquer falha
+        return back()->withErrors(['login' => 'Usuário ou senha incorretos.']);
     }
 
     public function logout(Request $request)

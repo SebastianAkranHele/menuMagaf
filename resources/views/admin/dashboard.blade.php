@@ -108,8 +108,23 @@
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // ===== SweetAlert Boas-vindas =====
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Bem-vindo!',
+            text: '{{ session('success') }}',
+            confirmButtonColor: '#A1887F',
+            timer: 2500,
+            timerProgressBar: true
+        });
+    @endif
+
+    // ===== Tooltip padrão para gráficos =====
     const tooltipOptions = {
         enabled: true,
         backgroundColor: '#db0505',
@@ -195,4 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
+
+
+
 @endsection

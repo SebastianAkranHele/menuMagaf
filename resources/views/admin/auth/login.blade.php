@@ -11,13 +11,7 @@
             --light: #F5F5F5;
             --text-dark: #3E2723;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: var(--primary);
@@ -27,13 +21,7 @@
             align-items: center;
             justify-content: center;
         }
-
-        .login-container {
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-        }
-
+        .login-container { width: 100%; max-width: 400px; padding: 20px; }
         .login-form {
             background: rgba(255, 255, 255, 0.1);
             padding: 2rem;
@@ -41,23 +29,10 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-
-        .login-form h2 {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            color: var(--light);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
+        .login-form h2 { text-align: center; margin-bottom: 0.5rem; color: var(--light); }
+        .login-form p { text-align: center; margin-bottom: 1.5rem; color: #D7CCC8; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
         .form-group input {
             width: 100%;
             padding: 0.75rem;
@@ -67,12 +42,7 @@
             color: var(--light);
             font-size: 1rem;
         }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
+        .form-group input:focus { outline: none; border-color: var(--accent); }
         .btn {
             width: 100%;
             padding: 0.75rem;
@@ -85,37 +55,26 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
-        .btn:hover {
-            background: #8A7169;
-            transform: translateY(-2px);
-        }
-
-        .alert {
-            padding: 0.75rem;
-            border-radius: 5px;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .alert-error {
-            background: rgba(231, 76, 60, 0.2);
-            border: 1px solid rgba(231, 76, 60, 0.5);
-            color: #e74c3c;
-        }
+        .btn:hover { background: #8A7169; transform: translateY(-2px); }
+        .logo-container { text-align: center; margin-bottom: 1rem; }
+        .logo-container img { max-width: 150px; }
     </style>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div class="login-container">
         <div class="login-form">
-            <h2>Garrafeira das 5 Curvas</h2>
-            <p style="text-align: center; margin-bottom: 1.5rem; color: #D7CCC8;">Painel Administrativo</p>
 
-            @if ($errors->any())
-                <div class="alert alert-error">
-                    Credenciais inválidas.
-                </div>
-            @endif
+            <!-- Logo da empresa -->
+            <div class="logo-container">
+              <img src="{{ asset('assets/magaf1.jpg') }}" alt="Garrafeira Logo">
+
+            </div>
+
+            <h2>Garrafeira das 5 Curvas</h2>
+            <p>Painel Administrativo</p>
 
             <form method="POST" action="{{ route('admin.login.post') }}">
                 @csrf
@@ -131,5 +90,29 @@
             </form>
         </div>
     </div>
+
+    <script>
+        // Mensagem de sucesso
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Bem-vindo!',
+                text: '{{ session('success') }}',
+                confirmButtonColor: '#A1887F'
+            });
+        @endif
+
+        // Mensagens de erro
+        @if($errors->any())
+            @foreach ($errors->all() as $error)
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro!',
+                    text: '{{ $error }}',
+                    confirmButtonColor: '#e60d0d'
+                });
+            @endforeach
+        @endif
+    </script>
 </body>
 </html>

@@ -64,61 +64,62 @@
             </td>
             <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
             <td>
-                {{-- Ver pedido --}}
-                <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-primary">
-                    <i class="fas fa-eye"></i> Ver
-                </a>
+    {{-- Ver pedido --}}
+    <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-sm btn-primary" title="Ver Pedido">
+        <i class="fas fa-eye"></i>
+    </a>
 
-                {{-- Exportações individuais --}}
-                <a href="{{ route('admin.orders.export.single', $order) }}" class="btn btn-sm btn-danger" title="Exportar PDF">
-                    <i class="fas fa-file-pdf"></i>
-                </a>
-                <a href="{{ route('admin.orders.export.single.excel', $order) }}" class="btn btn-sm btn-success" title="Exportar Excel">
-                    <i class="fas fa-file-excel"></i>
-                </a>
-                <a href="{{ route('admin.orders.export.single.csv', $order) }}" class="btn btn-sm btn-secondary" title="Exportar CSV">
-                    <i class="fas fa-file-csv"></i>
-                </a>
+    {{-- Exportações individuais --}}
+    <a href="{{ route('admin.orders.export.single', $order) }}" class="btn btn-sm btn-danger" title="Exportar PDF">
+        <i class="fas fa-file-pdf"></i>
+    </a>
+    <a href="{{ route('admin.orders.export.single.excel', $order) }}" class="btn btn-sm btn-success" title="Exportar Excel">
+        <i class="fas fa-file-excel"></i>
+    </a>
+    <a href="{{ route('admin.orders.export.single.csv', $order) }}" class="btn btn-sm btn-secondary" title="Exportar CSV">
+        <i class="fas fa-file-csv"></i>
+    </a>
 
-                {{-- Botões de status --}}
-                @if($order->status === 'pending')
-                    <form action="{{ route('admin.orders.complete', $order) }}" method="POST" class="d-inline-block">
-                        @csrf
-                        <button type="button" class="btn btn-sm btn-success complete-order" data-id="{{ $order->id }}">
-                            <i class="fas fa-check"></i> Concluir
-                        </button>
-                    </form>
-                    <form action="{{ route('admin.orders.cancel', $order) }}" method="POST" class="d-inline-block">
-                        @csrf
-                        <button type="button" class="btn btn-sm btn-danger cancel-order" data-id="{{ $order->id }}">
-                            <i class="fas fa-times"></i> Cancelar
-                        </button>
-                    </form>
-                @elseif($order->status === 'completed')
-                    <form action="{{ route('admin.orders.cancel', $order) }}" method="POST" class="d-inline-block">
-                        @csrf
-                        <button type="button" class="btn btn-sm btn-danger cancel-order" data-id="{{ $order->id }}">
-                            <i class="fas fa-times"></i> Cancelar
-                        </button>
-                    </form>
-                @elseif($order->status === 'canceled')
-                    <form action="{{ route('admin.orders.restorePending', $order) }}" method="POST" class="d-inline-block">
-                        @csrf
-                        <button type="button" class="btn btn-sm btn-warning restore-order" data-id="{{ $order->id }}">
-                            <i class="fas fa-undo"></i> Restaurar
-                        </button>
-                    </form>
-                @endif
+    {{-- Botões de status --}}
+    @if($order->status === 'pending')
+        <form action="{{ route('admin.orders.complete', $order) }}" method="POST" class="d-inline-block">
+            @csrf
+            <button type="button" class="btn btn-sm btn-success complete-order" title="Concluir Pedido">
+                <i class="fas fa-check"></i>
+            </button>
+        </form>
+        <form action="{{ route('admin.orders.cancel', $order) }}" method="POST" class="d-inline-block">
+            @csrf
+            <button type="button" class="btn btn-sm btn-danger cancel-order" title="Cancelar Pedido">
+                <i class="fas fa-times"></i>
+            </button>
+        </form>
+    @elseif($order->status === 'completed')
+        <form action="{{ route('admin.orders.cancel', $order) }}" method="POST" class="d-inline-block">
+            @csrf
+            <button type="button" class="btn btn-sm btn-danger cancel-order" title="Cancelar Pedido">
+                <i class="fas fa-times"></i>
+            </button>
+        </form>
+    @elseif($order->status === 'canceled')
+        <form action="{{ route('admin.orders.restorePending', $order) }}" method="POST" class="d-inline-block">
+            @csrf
+            <button type="button" class="btn btn-sm btn-warning restore-order" title="Restaurar Pedido">
+                <i class="fas fa-undo"></i>
+            </button>
+        </form>
+    @endif
 
-                {{-- Botão de deletar --}}
-                <form action="{{ route('admin.orders.destroy', $order) }}" method="POST" class="d-inline-block">
-                    @csrf
-                    @method('DELETE')
-                    <button type="button" class="btn btn-sm btn-danger delete-order" data-id="{{ $order->id }}">
-                        <i class="fas fa-trash"></i> Deletar
-                    </button>
-                </form>
-            </td>
+    {{-- Botão de deletar --}}
+    <form action="{{ route('admin.orders.destroy', $order) }}" method="POST" class="d-inline-block">
+        @csrf
+        @method('DELETE')
+        <button type="button" class="btn btn-sm btn-dark delete-order" title="Deletar Pedido">
+            <i class="fas fa-trash"></i>
+        </button>
+    </form>
+</td>
+
         </tr>
         @empty
         <tr>

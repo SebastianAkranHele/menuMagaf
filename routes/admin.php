@@ -105,5 +105,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 ->name('export.csv.single');
 
          });
+         /* Codigo QR */
+            Route::get('qrcode', [App\Http\Controllers\Admin\QrCodeController::class, 'index'])
+                ->name('qrcode.index');
+
     });
 });

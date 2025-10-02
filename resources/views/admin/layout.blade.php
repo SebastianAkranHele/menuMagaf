@@ -37,6 +37,7 @@
             <li><a href="{{ route('admin.products.index') }}" class="nav-link">Produtos</a></li>
             <li><a href="{{ route('admin.orders.index') }}" class="nav-link">Pedidos</a></li>
              <li><a href="{{ route('admin.reports.index') }}" class="nav-link">Relatorios</a></li>
+              <li><a href="{{ route('admin.qrcode.index') }}" class="nav-link">QR Code</a></li>
 
         </ul>
     </div>

@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $hero->title ?? 'MAGAF - Menu Digital' }}</title>
+
+      {{-- Atualização automática opcional --}}
+    @hasSection('auto-refresh')
+        <meta http-equiv="refresh" content="@yield('auto-refresh', 30)">
+    @endif
+    
     @vite(['resources/css/home.css', 'resources/js/home.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>

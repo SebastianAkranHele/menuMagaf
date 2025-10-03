@@ -1,3 +1,4 @@
+@section('auto-refresh', 30) {{-- atualiza a cada 30 segundos --}}
 @extends('admin.layout')
 
 @section('content')

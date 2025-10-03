@@ -7,6 +7,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Menu - Garrafeira das 5 Curvas</title>
 
+      {{-- Atualização automática opcional --}}
+    @hasSection('auto-refresh')
+        <meta http-equiv="refresh" content="@yield('auto-refresh', 30)">
+    @endif
+
     @vite(['resources/css/menu.css', 'resources/css/app.css', 'resources/js/menu.js', 'resources/js/app.js'])
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

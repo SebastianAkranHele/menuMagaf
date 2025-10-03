@@ -16,7 +16,11 @@
             </a>
             <a href="{{ route('admin.reports.products', request()->only(['start_date', 'end_date'])) }}"
                 class="btn btn-danger">
-                <i class="fas fa-file-pdf me-1"></i> Produtos
+                <i class="fas fa-box me-1"></i> Produtos
+            </a>
+            <a href="{{ route('admin.reports.visits', request()->only(['start_date', 'end_date'])) }}"
+               class="btn btn-info">
+                <i class="fas fa-eye me-1"></i> Relatório de Visitas
             </a>
         </div>
     </div>
@@ -74,85 +78,100 @@
     </div>
 
     {{-- Top Produtos e Categorias --}}
-   <div class="row mb-3 g-3">
-    <div class="col-12 col-md-6 d-flex">
-        <div class="card p-3 flex-fill d-flex flex-column h-100">
-            <h5>Top Produtos (Qtd)</h5>
-            <div class="table-responsive flex-fill">
-                <table class="table table-striped mb-0">
-                    <thead>
-                        <tr>
-                            <th>Produto</th>
-                            <th>Qtd Vendida</th>
-                            <th>Receita</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($topProducts as $p)
+    <div class="row mb-3 g-3">
+        <div class="col-12 col-md-6 d-flex">
+            <div class="card p-3 flex-fill d-flex flex-column h-100">
+                <h5>Top Produtos (Qtd)</h5>
+                <div class="table-responsive flex-fill">
+                    <table class="table table-striped mb-0">
+                        <thead>
                             <tr>
-                                <td>{{ $p->name }}</td>
-                                <td>{{ $p->qty_sold ?? 0 }}</td>
-                                <td>KZ {{ number_format($p->revenue ?? 0, 2, ',', '.') }}</td>
+                                <th>Produto</th>
+                                <th>Qtd Vendida</th>
+                                <th>Receita</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($topProducts as $p)
+                                <tr>
+                                    <td>{{ $p->name }}</td>
+                                    <td>{{ $p->qty_sold ?? 0 }}</td>
+                                    <td>KZ {{ number_format($p->revenue ?? 0, 2, ',', '.') }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-6 d-flex">
+            <div class="card p-3 flex-fill d-flex flex-column h-100">
+                <h5>Top Categorias</h5>
+                <div class="table-responsive flex-fill">
+                    <table class="table table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Categoria</th>
+                                <th>Qtd Vendida</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($topCategories as $c)
+                                <tr>
+                                    <td>{{ $c->name }}</td>
+                                    <td>{{ $c->qty_sold }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-
-    <div class="col-12 col-md-6 d-flex">
-        <div class="card p-3 flex-fill d-flex flex-column h-100">
-            <h5>Top Categorias</h5>
-            <div class="table-responsive flex-fill">
-                <table class="table table-striped mb-0">
-                    <thead>
-                        <tr>
-                            <th>Categoria</th>
-                            <th>Qtd Vendida</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($topCategories as $c)
-                            <tr>
-                                <td>{{ $c->name }}</td>
-                                <td>{{ $c->qty_sold }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-
 
     {{-- Gráficos --}}
-     {{-- Gráficos --}}
     <div class="row mb-3 g-3">
-    <div class="col-12 col-md-6 d-flex">
-        <div class="card flex-fill p-3 h-100 shadow-sm bg-white" style="border: 1px solid #dee2e6; border-radius:0.5rem;">
-            <h5>Vendas por Dia</h5>
-            <canvas id="salesByDay" style="min-height:200px;"></canvas>
+        <div class="col-12 col-md-6 d-flex">
+            <div class="card flex-fill p-3 h-100 shadow-sm bg-white"
+                style="border: 1px solid #dee2e6; border-radius:0.5rem;">
+                <h5>Vendas por Dia</h5>
+                <canvas id="salesByDay" style="min-height:200px;"></canvas>
+            </div>
+        </div>
+        <div class="col-12 col-md-6 d-flex">
+            <div class="card flex-fill p-3 h-100 shadow-sm bg-white"
+                style="border: 1px solid #dee2e6; border-radius:0.5rem;">
+                <h5>Pedidos por Hora</h5>
+                <canvas id="ordersByHour" style="min-height:200px;"></canvas>
+            </div>
         </div>
     </div>
-    <div class="col-12 col-md-6 d-flex">
-        <div class="card flex-fill p-3 h-100 shadow-sm bg-white" style="border: 1px solid #dee2e6; border-radius:0.5rem;">
-            <h5>Pedidos por Hora</h5>
-            <canvas id="ordersByHour" style="min-height:200px;"></canvas>
-        </div>
-    </div>
-</div>
 
-    {{-- Produtos nunca vendidos --}}
+    {{-- Produtos menos vendidos --}}
     <div class="card p-3 mb-3">
-        <h5>Produtos nunca vendidos</h5>
-        <div class="d-flex flex-wrap gap-1">
-            @forelse($neverSold as $prod)
-                <span class="badge bg-secondary">{{ $prod->name }}</span>
-            @empty
-                <p>Nenhum</p>
-            @endforelse
+        <h5>Produtos menos vendidos</h5>
+        <div class="table-responsive">
+            <table class="table table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Qtd Vendida</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($leastSold as $prod)
+                        <tr>
+                            <td>{{ $prod->name }}</td>
+                            <td>{{ $prod->qty_sold ?? 0 }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="2" class="text-center">Nenhum</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -208,14 +227,35 @@
 
         new Chart(document.getElementById('salesByDay'), {
             type: 'line',
-            data: { labels: days, datasets: [{ label: 'Pedidos por dia', data: dayCounts, tension: 0.3, borderColor: '#db0505', backgroundColor: 'rgba(219,5,5,0.1)', fill: true }] },
-            options: { responsive: true }
+            data: {
+                labels: days,
+                datasets: [{
+                    label: 'Pedidos por dia',
+                    data: dayCounts,
+                    tension: 0.3,
+                    borderColor: '#db0505',
+                    backgroundColor: 'rgba(219,5,5,0.1)',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true
+            }
         });
 
         new Chart(document.getElementById('ordersByHour'), {
             type: 'bar',
-            data: { labels: hours, datasets: [{ label: 'Pedidos', data: ordersByHour, backgroundColor: '#a73406' }] },
-            options: { responsive: true }
+            data: {
+                labels: hours,
+                datasets: [{
+                    label: 'Pedidos',
+                    data: ordersByHour,
+                    backgroundColor: '#a73406'
+                }]
+            },
+            options: {
+                responsive: true
+            }
         });
     </script>
 @endpush

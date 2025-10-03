@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Order;
+use App\Models\Visit; // <- modelo de visitas
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -16,10 +17,10 @@ class DashboardController extends Controller
         // =====================
         // 1. Resumo (cards)
         // =====================
-        $totalProducts = Product::count();
+        $totalProducts   = Product::count();
         $totalCategories = Category::count();
-        $ordersToday = Order::whereDate('created_at', Carbon::today())->count();
-        $totalVisits = 0; // se tiver sistema de analytics, colocar aqui
+        $ordersToday     = Order::whereDate('created_at', Carbon::today())->count();
+        $totalVisits = Visit::whereDate('created_at', today())->count();// total de visitas registradas
 
         // =====================
         // 2. Resumo de pedidos
@@ -32,35 +33,43 @@ class DashboardController extends Controller
         // 3. Dados dos gráficos
         // =====================
 
-        // Visitas últimos 7 dias (exemplo random, substituir com real)
+        // --- Visitas últimos 7 dias
         $visitsWeekLabels = [];
-        $visitsWeekData = [];
+        $visitsWeekData   = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::today()->subDays($i);
-            $visitsWeekLabels[] = $date->format('D'); // Seg, Ter...
-            $visitsWeekData[] = rand(100, 250); // exemplo random
+            $visitsWeekLabels[] = $date->format('D'); // Ex: Seg, Ter
+            $visitsWeekData[]   = Visit::whereDate('created_at', $date)->count();
         }
 
-        // Pedidos por categoria
-        $categories = Category::withCount('products')->get(); // ou orders se quiser por pedidos
+        // --- Pedidos por categoria
+        $categories = Category::with('products')->get();
         $ordersByCategoryLabels = $categories->pluck('name');
-        $ordersByCategoryData = $categories->map(function($cat){
-            return $cat->products()->count(); // ou contar pedidos da categoria
+        $ordersByCategoryData = $categories->map(function ($cat) {
+            // contar quantos pedidos existem com produtos dessa categoria
+            return Order::whereHas('products', function ($q) use ($cat) {
+                $q->where('category_id', $cat->id);
+            })->count();
         });
 
-        // Distribuição de produtos
-        $productsByCategoryData = $categories->map(function($cat){
+        // --- Distribuição de produtos por categoria
+        $productsByCategoryData = $categories->map(function ($cat) {
             return $cat->products()->count();
         });
 
-        // Visitas e pedidos últimas 12 horas (exemplo random)
+        // --- Visitas e pedidos últimas 12 horas
         $visitsHoursLabels = [];
-        $visitsHoursData = [];
-        $ordersHoursData = [];
+        $visitsHoursData   = [];
+        $ordersHoursData   = [];
+
         for ($i = 0; $i < 12; $i++) {
-            $visitsHoursLabels[] = ($i+1).'h';
-            $visitsHoursData[] = rand(10, 50);
-            $ordersHoursData[] = rand(5, 20);
+            $hourStart = Carbon::now()->subHours(11 - $i)->startOfHour();
+            $hourEnd   = Carbon::now()->subHours(11 - $i)->endOfHour();
+            $label     = $hourStart->format('H:00');
+
+            $visitsHoursLabels[] = $label;
+            $visitsHoursData[]   = Visit::whereBetween('created_at', [$hourStart, $hourEnd])->count();
+            $ordersHoursData[]   = Order::whereBetween('created_at', [$hourStart, $hourEnd])->count();
         }
 
         return view('admin.dashboard', compact(

@@ -21,6 +21,10 @@
             <h3>Pedidos Hoje</h3>
             <p class="card-value">{{ $ordersToday ?? 0 }}</p>
         </div>
+        <div class="card summary-card bg-dark-red">
+            <h3>Visitas</h3>
+            <p class="card-value">{{ $totalVisits ?? 0 }}</p>
+        </div>
     </div>
 
     <!-- Lista de Pedidos por Status -->
@@ -210,7 +214,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
-
-
-
 @endsection

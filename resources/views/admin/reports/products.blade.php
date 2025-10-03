@@ -2,6 +2,9 @@
 
 @section('content')
 <div class="content-header mb-3">
+     <a href="{{ route('admin.reports.index') }}" class="btn btn-primary">
+        <i class="fas fa-arrow-left me-1"></i> Voltar
+    </a>
     <h1>Relatório de Produtos</h1>
 </div>
 

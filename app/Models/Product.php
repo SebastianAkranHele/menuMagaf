@@ -14,6 +14,7 @@ class Product extends Model
         'name',  'stock', 'slug', 'description', 'price', 'image', 'category_id'
     ];
 
+        protected $appends = ['available']; // acessor appended
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -40,5 +41,11 @@ class Product extends Model
 
             $product->slug = $count ? "{$baseSlug}-{$count}" : $baseSlug;
         });
+    }
+
+    // Acessor para disponibilidade
+    public function getAvailableAttribute()
+    {
+        return $this->stock > 0;
     }
 }

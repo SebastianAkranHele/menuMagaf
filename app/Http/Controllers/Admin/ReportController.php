@@ -6,12 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Visit;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\OrderExport;
 
 class ReportController extends Controller
 {
@@ -51,12 +50,12 @@ class ReportController extends Controller
 
         // Top produtos
         $topProducts = Product::select(
-                'products.id',
-                'products.name',
-                'products.cost',
-                DB::raw('SUM(order_product.quantity) as qty_sold'),
-                DB::raw('SUM(order_product.quantity * order_product.price) as revenue')
-            )
+            'products.id',
+            'products.name',
+            'products.cost',
+            DB::raw('SUM(order_product.quantity) as qty_sold'),
+            DB::raw('SUM(order_product.quantity * order_product.price) as revenue')
+        )
             ->join('order_product', 'products.id', '=', 'order_product.product_id')
             ->join('orders', 'orders.id', '=', 'order_product.order_id')
             ->whereBetween('orders.created_at', [$start, $end])
@@ -69,10 +68,10 @@ class ReportController extends Controller
 
         // Top categorias
         $topCategories = Category::select(
-                'categories.id',
-                'categories.name',
-                DB::raw('SUM(order_product.quantity) as qty_sold')
-            )
+            'categories.id',
+            'categories.name',
+            DB::raw('SUM(order_product.quantity) as qty_sold')
+        )
             ->join('products', 'categories.id', '=', 'products.category_id')
             ->join('order_product', 'products.id', '=', 'order_product.product_id')
             ->join('orders', 'orders.id', '=', 'order_product.order_id')
@@ -109,8 +108,11 @@ class ReportController extends Controller
             $dayCounts[] = $ordersByDayRaw[$d] ?? 0;
         }
 
-        // Produtos nunca vendidos
-        $neverSold = Product::whereDoesntHave('orders')->take(10)->get();
+        // Pedidos menos vendidos (com menor valor total)
+        $leastSold = Order::whereBetween('created_at', [$start, $end])
+            ->orderBy('total', 'asc')
+            ->take(10)
+            ->get();
 
         // Últimos pedidos
         $recentOrders = Order::latest()->take(10)->get();
@@ -121,21 +123,30 @@ class ReportController extends Controller
             ->having('orders_count', '>', 3)
             ->get();
 
-        // Pagamentos
-       // $paymentsStats = Order::select('payment_method', DB::raw('COUNT(*) as total_orders'), DB::raw('SUM(total) as total_revenue'))
-          //  ->groupBy('payment_method')
-          //  ->get();
-
         // Horário e dia de pico
         $peakHour = array_search(max($ordersByHour), $ordersByHour);
         $peakDay  = array_search(max($dayCounts), $dayCounts);
 
         return view('admin.reports.index', compact(
-            'start','end','totalOrders','totalRevenue','avgTicket','totalProfit','ordersByStatus',
-            'topProducts','topCategories','ordersByHour','hours',
-            'days','dayCounts','neverSold','recentOrders','frequentCustomers','peakHour','peakDay'
+            'start',
+            'end',
+            'totalOrders',
+            'totalRevenue',
+            'avgTicket',
+            'totalProfit',
+            'ordersByStatus',
+            'topProducts',
+            'topCategories',
+            'ordersByHour',
+            'hours',
+            'days',
+            'dayCounts',
+            'leastSold', // corrigido aqui
+            'recentOrders',
+            'frequentCustomers',
+            'peakHour',
+            'peakDay'
         ));
-
     }
 
     /**
@@ -146,11 +157,11 @@ class ReportController extends Controller
         [$start, $end] = $this->getDateRange($request);
 
         $topProducts = Product::select(
-                'products.id',
-                'products.name',
-                DB::raw('SUM(order_product.quantity) as qty_sold'),
-                DB::raw('SUM(order_product.quantity * order_product.price) as revenue')
-            )
+            'products.id',
+            'products.name',
+            DB::raw('SUM(order_product.quantity) as qty_sold'),
+            DB::raw('SUM(order_product.quantity * order_product.price) as revenue')
+        )
             ->join('order_product', 'products.id', '=', 'order_product.product_id')
             ->join('orders', 'orders.id', '=', 'order_product.order_id')
             ->whereBetween('orders.created_at', [$start, $end])
@@ -159,12 +170,13 @@ class ReportController extends Controller
             ->limit(10)
             ->get();
 
+        // Produtos nunca vendidos
         $neverSold = Product::whereDoesntHave('orders')->get();
 
         $categories = Category::select(
-                'categories.name',
-                DB::raw('SUM(order_product.quantity) as qty_sold')
-            )
+            'categories.name',
+            DB::raw('SUM(order_product.quantity) as qty_sold')
+        )
             ->join('products', 'categories.id', '=', 'products.category_id')
             ->join('order_product', 'products.id', '=', 'order_product.product_id')
             ->join('orders', 'orders.id', '=', 'order_product.order_id')
@@ -176,104 +188,90 @@ class ReportController extends Controller
         $lowStock = Product::where('stock', '<', 5)->orderBy('stock')->get();
 
         return view('admin.reports.products', compact(
-            'start','end','topProducts','neverSold','categories','lowStock'
+            'start',
+            'end',
+            'topProducts',
+            'neverSold',
+            'categories',
+            'lowStock'
         ));
     }
 
     /**
-     * Exportar CSV
+     * Relatório de Visitas
      */
-    public function exportCsv(Request $request)
+    public function visits(Request $request)
     {
         [$start, $end] = $this->getDateRange($request);
 
-        $orders = Order::with('products')
-            ->whereBetween('created_at', [$start, $end])
-            ->orderBy('created_at')
-            ->get();
+        $visits = Visit::whereBetween('created_at', [$start, $end])->get();
+        $totalVisits = $visits->count();
 
-        $filename = 'orders_' . $start->format('Ymd') . '_' . $end->format('Ymd') . '.csv';
+        // Agrupa visitas por dia
+        $visitsGrouped = $visits
+            ->groupBy(fn($item) => $item->created_at->format('Y-m-d'))
+            ->map->count()
+            ->sortKeys();
 
+        $visitsByDay = $visitsGrouped->mapWithKeys(fn($count, $date) =>
+            [Carbon::parse($date)->format('d/m') => $count]
+        );
+
+        return view('admin.reports.visits', [
+            'startDate'   => $start->toDateString(),
+            'endDate'     => $end->toDateString(),
+            'totalVisits' => $totalVisits,
+            'visitsByDay' => $visitsByDay,
+        ]);
+    }
+
+    /**
+     * Exportar PDF de Visitas
+     */
+    public function exportVisitsPdf(Request $request)
+    {
+        [$start, $end] = $this->getDateRange($request);
+        $visits = Visit::whereBetween('created_at', [$start, $end])->get();
+        $totalVisits = $visits->count();
+
+        $pdf = Pdf::loadView('admin.reports.pdf.visits', compact(
+            'visits',
+            'start',
+            'end',
+            'totalVisits'
+        ));
+
+        return $pdf->download('visitas_' . $start->format('Ymd') . '_' . $end->format('Ymd') . '.pdf');
+    }
+
+    /**
+     * Exportar CSV de Visitas
+     */
+    public function exportVisitsCsv(Request $request)
+    {
+        [$start, $end] = $this->getDateRange($request);
+        $visits = Visit::whereBetween('created_at', [$start, $end])->get();
+
+        $filename = 'visitas_' . $start->format('Ymd') . '_' . $end->format('Ymd') . '.csv';
         $headers = [
             'Content-type' => 'text/csv',
             'Content-Disposition' => "attachment; filename={$filename}",
         ];
 
-        $callback = function() use ($orders) {
+        $callback = function () use ($visits) {
             $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['ID','Cliente','Total','Status','Data','Itens']);
-            foreach ($orders as $order) {
-                $items = $order->products->map(fn($p) => "{$p->name} (x{$p->pivot->quantity} @ {$p->pivot->price})")->implode(' | ');
-
+            fputcsv($handle, ['ID', 'IP', 'User Agent', 'Data']);
+            foreach ($visits as $visit) {
                 fputcsv($handle, [
-                    $order->id,
-                    $order->customer_name ?? 'N/A',
-                    $order->total,
-                    $order->status,
-                    $order->created_at->format('Y-m-d H:i:s'),
-                    $items
+                    $visit->id,
+                    $visit->ip ?? 'N/A',
+                    $visit->user_agent ?? 'N/A',
+                    $visit->created_at->format('Y-m-d H:i:s')
                 ]);
             }
             fclose($handle);
         };
 
         return response()->stream($callback, 200, $headers);
-    }
-
-    /**
-     * Exportar PDF
-     */
-    public function exportPdf(Request $request)
-    {
-        [$start, $end] = $this->getDateRange($request);
-
-        $orders = Order::with('products')
-            ->whereBetween('created_at', [$start, $end])
-            ->orderBy('created_at')
-            ->get();
-
-        $totalOrders  = $orders->count();
-        $totalRevenue = $orders->where('status', 'completed')->sum('total');
-        $avgTicket    = $totalOrders > 0 ? round($totalRevenue / $totalOrders, 2) : 0;
-
-        $pdf = Pdf::loadView('admin.reports.pdf.orders', compact(
-            'orders','start','end','totalOrders','totalRevenue','avgTicket'
-        ));
-
-        return $pdf->download('orders_' . $start->format('Ymd') . '_' . $end->format('Ymd') . '.pdf');
-    }
-
-    // Exportar PDF de um pedido específico
-    public function exportPdfSingle(Order $order)
-    {
-        $pdf = Pdf::loadView('admin.reports.pdf_single', compact('order'));
-        return $pdf->download("pedido_{$order->id}.pdf");
-    }
-
-    // Exportar CSV de um pedido específico
-    public function exportCsvSingle(Order $order)
-    {
-        $filename = "pedido_{$order->id}.csv";
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => "attachment; filename={$filename}",
-        ];
-
-        $callback = function() use ($order) {
-            $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['Produto','Quantidade','Preço']);
-            foreach($order->products as $p){
-                fputcsv($handle, [$p->name, $p->pivot->quantity, $p->pivot->price]);
-            }
-            fclose($handle);
-        };
-
-        return response()->stream($callback, 200, $headers);
-    }
-
-    // Exportar Excel de um pedido específico
-    public function exportExcelSingle(Order $order)
-    {
-        return Excel::download(new OrderExport($order), "pedido_{$order->id}.xlsx");
     }
 }

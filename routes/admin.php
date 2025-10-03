@@ -104,10 +104,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/export/csv/{order}', [ReportController::class, 'exportSingleCsv'])
                 ->name('export.csv.single');
 
-         });
-         /* Codigo QR */
-            Route::get('qrcode', [App\Http\Controllers\Admin\QrCodeController::class, 'index'])
-                ->name('qrcode.index');
+            // Relatório de visitas
+            Route::get('/visits', [ReportController::class, 'visits'])->name('visits');
+Route::get('/visits/pdf', [ReportController::class, 'exportVisitsPdf'])->name('visits.pdf');
+Route::get('/visits/csv', [ReportController::class, 'exportVisitsCsv'])->name('visits.csv');
 
+        });
+        /* Codigo QR */
+        Route::get('qrcode', [App\Http\Controllers\Admin\QrCodeController::class, 'index'])
+            ->name('qrcode.index');
     });
 });

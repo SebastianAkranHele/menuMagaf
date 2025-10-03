@@ -64,17 +64,52 @@ header {
 }
 
 /* Hero Section (apenas imagem de fundo) */
+/* Hero Section (apenas imagem de fundo) */
 .hero {
-    background: linear-gradient(rgba(58, 45, 40, 0.8), rgba(58, 45, 40, 0.8));
+    background: linear-gradient(rgba(58,45,40,0.8), rgba(58,45,40,0.8));
+    background-image: url('sua-imagem.jpg'); /* use inline ou via blade */
+    background-repeat: no-repeat;
+    background-position: center top;
+    background-size: auto 100%; /* mantém proporção, altura máxima do container */
     padding: 2.5rem 1rem;
     text-align: center;
     border-radius: 12px;
     margin: 1rem 0;
     min-height: 300px;
+    max-height: 400px; /* limita altura em telas pequenas */
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
 }
+
+
+/* Ajustes para telas pequenas */
+@media (max-width: 768px) {
+    .hero {
+        min-height: 250px; /* menor altura para mobile */
+        background-size: contain; /* mantém a proporção da imagem */
+    }
+}
+
+@media (max-width: 480px) {
+    .hero {
+        min-height: 200px;
+        background-size: contain;
+        background-position: top center;
+        border-radius: 8px;
+    }
+}
+
+/* Modo paisagem em dispositivos móveis */
+@media (max-height: 500px) and (orientation: landscape) {
+    .hero {
+        min-height: 180px;
+        background-size: contain;
+        background-position: top center;
+    }
+}
+
 .social-link {
     display: inline-flex;
     align-items: center;

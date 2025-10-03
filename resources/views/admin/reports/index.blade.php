@@ -6,10 +6,7 @@
 
         {{-- Botões de exportação geral --}}
         <div class="d-flex gap-2 flex-wrap">
-            <a href="{{ route('admin.reports.export.csv', request()->only(['start_date', 'end_date'])) }}"
-                class="btn btn-secondary">
-                <i class="fas fa-file-csv me-1"></i> CSV
-            </a>
+
             <a href="{{ route('admin.reports.export.pdf', request()->only(['start_date', 'end_date'])) }}"
                 class="btn btn-danger">
                 <i class="fas fa-file-pdf me-1"></i> PDF
@@ -18,9 +15,8 @@
                 class="btn btn-danger">
                 <i class="fas fa-box me-1"></i> Produtos
             </a>
-            <a href="{{ route('admin.reports.visits', request()->only(['start_date', 'end_date'])) }}"
-               class="btn btn-info">
-                <i class="fas fa-eye me-1"></i> Relatório de Visitas
+            <a href="{{ route('admin.reports.visits', request()->only(['start_date', 'end_date'])) }}" class="btn btn-info">
+                <i class="fas fa-eye me-1"></i> Visitas
             </a>
         </div>
     </div>

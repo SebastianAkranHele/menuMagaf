@@ -108,11 +108,15 @@ class ReportController extends Controller
             $dayCounts[] = $ordersByDayRaw[$d] ?? 0;
         }
 
-        // Pedidos menos vendidos (com menor valor total)
-        $leastSold = Order::whereBetween('created_at', [$start, $end])
-            ->orderBy('total', 'asc')
+        // Produtos menos vendidos no período
+        // Produtos menos vendidos no período
+        $leastSold = Product::withSum(['orders as qty_sold' => function ($query) use ($start, $end) {
+            $query->whereBetween('orders.created_at', [$start, $end]);
+        }], 'order_product.quantity')
+            ->orderBy('qty_sold', 'asc')
             ->take(10)
             ->get();
+
 
         // Últimos pedidos
         $recentOrders = Order::latest()->take(10)->get();
@@ -213,7 +217,8 @@ class ReportController extends Controller
             ->map->count()
             ->sortKeys();
 
-        $visitsByDay = $visitsGrouped->mapWithKeys(fn($count, $date) =>
+        $visitsByDay = $visitsGrouped->mapWithKeys(
+            fn($count, $date) =>
             [Carbon::parse($date)->format('d/m') => $count]
         );
 
@@ -273,5 +278,53 @@ class ReportController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /* Export PDF */
+
+    public function exportPdf(Request $request)
+    {
+        [$start, $end] = $this->getDateRange($request);
+
+        $ordersQuery = Order::whereBetween('created_at', [$start, $end]);
+
+        $totalOrders  = $ordersQuery->count();
+        $totalRevenue = (clone $ordersQuery)->where('status', 'completed')->sum('total');
+        $avgTicket    = $totalOrders > 0 ? round($totalRevenue / $totalOrders, 2) : 0;
+
+        // Top produtos
+        $topProducts = Product::select(
+            'products.id',
+            'products.name',
+            DB::raw('SUM(order_product.quantity) as qty_sold'),
+            DB::raw('SUM(order_product.quantity * order_product.price) as revenue')
+        )
+            ->join('order_product', 'products.id', '=', 'order_product.product_id')
+            ->join('orders', 'orders.id', '=', 'order_product.order_id')
+            ->whereBetween('orders.created_at', [$start, $end])
+            ->groupBy('products.id', 'products.name')
+            ->orderByDesc('qty_sold')
+            ->limit(10)
+            ->get();
+
+        // Produtos menos vendidos
+        $leastSold = Product::withSum(['orders as qty_sold' => function ($query) use ($start, $end) {
+            $query->whereBetween('orders.created_at', [$start, $end]);
+        }], 'order_product.quantity')
+            ->orderBy('qty_sold', 'asc')
+            ->take(10)
+            ->get();
+
+        $pdf = Pdf::loadView('admin.reports.pdf.pdfRelator', compact(
+            'start',
+            'end',
+            'totalOrders',
+            'totalRevenue',
+            'avgTicket',
+            'topProducts',
+            'leastSold'
+        ));
+
+        return $pdf->download('relatorio_' . $start->format('Ymd') . '_' . $end->format('Ymd') . '.pdf');
     }
 }

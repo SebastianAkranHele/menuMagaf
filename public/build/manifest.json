@@ -1,0 +1,52 @@
+{
+  "resources/css/admin.css": {
+    "file": "assets/admin-b7b6c4da.css",
+    "isEntry": true,
+    "src": "resources/css/admin.css"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-c5c541cb.css",
+    "isEntry": true,
+    "src": "resources/css/app.css"
+  },
+  "resources/css/home.css": {
+    "file": "assets/home-455a4c01.css",
+    "isEntry": true,
+    "src": "resources/css/home.css"
+  },
+  "resources/css/homehero-index.css": {
+    "file": "assets/homehero-index-57700b6c.css",
+    "isEntry": true,
+    "src": "resources/css/homehero-index.css"
+  },
+  "resources/css/menu.css": {
+    "file": "assets/menu-65177e9b.css",
+    "isEntry": true,
+    "src": "resources/css/menu.css"
+  },
+  "resources/js/admin.js": {
+    "file": "assets/admin-c16cb175.js",
+    "isEntry": true,
+    "src": "resources/js/admin.js"
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-66cd7cd1.js",
+    "isEntry": true,
+    "src": "resources/js/app.js"
+  },
+  "resources/js/home.js": {
+    "file": "assets/home-bb36d081.js",
+    "isEntry": true,
+    "src": "resources/js/home.js"
+  },
+  "resources/js/homehero-index.js": {
+    "file": "assets/homehero-index-b3175727.js",
+    "isEntry": true,
+    "src": "resources/js/homehero-index.js"
+  },
+  "resources/js/menu.js": {
+    "file": "assets/menu-bfccf3dc.js",
+    "isEntry": true,
+    "src": "resources/js/menu.js"
+  }
+}

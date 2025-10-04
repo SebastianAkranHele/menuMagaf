@@ -46,7 +46,7 @@
         const ctx = canvas.getContext("2d");
         const logo = new Image();
         logo.crossOrigin = "anonymous";
-        logo.src = "https:/magaf.ao/menu-digital/assets/img/magaf1.jpg";
+        logo.src = "https:/magaf.ao/menuDigital/assets/magaf1.jpg";
 
         logo.onload = function () {
             const logoSize = canvas.width * 0.2;

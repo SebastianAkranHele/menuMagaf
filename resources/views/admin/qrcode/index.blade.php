@@ -28,7 +28,7 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 <script>
-    const menuLink = "https://sebastianakranhele.github.io/menu-digital/index.html";
+    const menuLink = "https://magaf.ao";
     const canvas = document.getElementById("qrcode");
     const downloadLink = document.getElementById("download-link");
 
@@ -46,7 +46,7 @@
         const ctx = canvas.getContext("2d");
         const logo = new Image();
         logo.crossOrigin = "anonymous";
-        logo.src = "https://sebastianakranhele.github.io/menu-digital/assets/img/magaf1.jpg";
+        logo.src = "https:/magaf.ao/menu-digital/assets/img/magaf1.jpg";
 
         logo.onload = function () {
             const logoSize = canvas.width * 0.2;

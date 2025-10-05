@@ -83,6 +83,90 @@ header {
     width: 100%;
 }
 
+/* AJUSTE DO LOGIN NA HOME */
+
+.btn-admin-access {
+    background-color: #c8102e;
+    color: #fff;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn-admin-access:hover {
+    background-color: #a10d24;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+.modal.hidden {
+    display: none;
+}
+.modal-content {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+    width: 320px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    animation: fadeIn 0.3s ease;
+}
+.input-code {
+    width: 80%;
+    padding: 10px;
+    font-size: 1rem;
+    margin: 15px 0;
+}
+.modal-actions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+}
+.btn-confirm, .btn-cancel {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.btn-confirm {
+    background-color: #28a745;
+    color: white;
+}
+.btn-confirm:hover {
+    background-color: #218838;
+}
+.btn-cancel {
+    background-color: #dc3545;
+    color: white;
+}
+.btn-cancel:hover {
+    background-color: #c82333;
+}
+.error-msg {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+.hidden {
+    display: none;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
 
 /* Ajustes para telas pequenas */
 @media (max-width: 768px) {
@@ -584,4 +668,55 @@ footer {
     body {
         background-color: var(--primary-dark);
     }
+}
+
+/* logout */
+.logout-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #28a745;
+    color: white;
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: slideInOut 3s ease forwards;
+    z-index: 9999;
+}
+
+@keyframes slideInOut {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    15% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    85% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+/* Fundo com blur suave ao abrir o modal */
+body.modal-open {
+    overflow: hidden; /* evita scroll no fundo */
+}
+
+body.modal-open::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 9998;
+    transition: backdrop-filter 0.3s ease;
 }

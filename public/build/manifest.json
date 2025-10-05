@@ -5,12 +5,12 @@
     "src": "resources/css/admin.css"
   },
   "resources/css/app.css": {
-    "file": "assets/app-c5c541cb.css",
+    "file": "assets/app-f4a693fc.css",
     "isEntry": true,
     "src": "resources/css/app.css"
   },
   "resources/css/home.css": {
-    "file": "assets/home-455a4c01.css",
+    "file": "assets/home-a856e0b3.css",
     "isEntry": true,
     "src": "resources/css/home.css"
   },
@@ -30,12 +30,12 @@
     "src": "resources/js/admin.js"
   },
   "resources/js/app.js": {
-    "file": "assets/app-66cd7cd1.js",
+    "file": "assets/app-ac04efc8.js",
     "isEntry": true,
     "src": "resources/js/app.js"
   },
   "resources/js/home.js": {
-    "file": "assets/home-bb36d081.js",
+    "file": "assets/home-7b790325.js",
     "isEntry": true,
     "src": "resources/js/home.js"
   },

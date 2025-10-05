@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $hero->title ?? 'MAGAF - Menu Digital' }}</title>
 
@@ -80,12 +81,38 @@
                 </div>
             </section>
         </main>
+        <!-- Botão para acessar área admin -->
+        <div class="text-center my-4">
+            <button id="btnAdminAccess" class="btn-admin-access">
+                Área Administrativa
+            </button>
+        </div>
+
+        <!-- Modal para código de acesso -->
+        <div id="adminAccessModal" class="modal hidden">
+            <div class="modal-content">
+                <h2 style="color: black; font-weight: bold;">Digite o código de acesso</h2>
+                <input type="password" id="adminCode" placeholder="Código" class="input-code">
+                <div class="modal-actions">
+                    <button id="verifyCodeBtn" class="btn-confirm">Entrar</button>
+                    <button id="closeModalBtn" class="btn-cancel">Cancelar</button>
+                </div>
+                <p id="errorMsg" class="error-msg hidden">Código incorreto!</p>
+            </div>
+        </div>
 
         <footer>
             <p>{{ $hero->footer_text ?? 'Magaf ' . date('Y') . ' - Todos os direitos reservados' }}</p>
         </footer>
 
     </div>
+
+    @if (session('logout_success'))
+        <div class="logout-alert" id="logoutAlert">
+            {{ session('logout_success') }}
+        </div>
+    @endif
+
 </body>
 
 </html>

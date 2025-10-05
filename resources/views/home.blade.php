@@ -78,15 +78,16 @@
                             <span>{{ ucfirst($name) }}</span>
                         </a>
                     @endforeach
+
+                    <!-- 🔹 Novo botão Área Administrativa -->
+                    <button id="btnAdminAccess" class="social-link admin-color">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Área Administrativa</span>
+                    </button>
                 </div>
             </section>
         </main>
-        <!-- Botão para acessar área admin -->
-        <div class="text-center my-4">
-            <button id="btnAdminAccess" class="btn-admin-access">
-                Área Administrativa
-            </button>
-        </div>
+
 
         <!-- Modal para código de acesso -->
         <div id="adminAccessModal" class="modal hidden">

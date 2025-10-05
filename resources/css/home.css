@@ -720,3 +720,9 @@ body.modal-open::before {
     z-index: 9998;
     transition: backdrop-filter 0.3s ease;
 }
+.admin-color {
+    background-color: #c8102e;
+}
+.admin-color:hover {
+    background-color: #a10d24;
+}

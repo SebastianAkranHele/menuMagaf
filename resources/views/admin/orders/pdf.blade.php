@@ -21,7 +21,7 @@
                 <th>ID</th>
                 <th>Total</th>
                 <th>Status</th>
-                <th>Criado em</th>
+                <th>Data e Hora</th>
             </tr>
         </thead>
         <tbody>

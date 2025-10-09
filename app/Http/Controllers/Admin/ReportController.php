@@ -208,18 +208,31 @@ class ReportController extends Controller
     {
         [$start, $end] = $this->getDateRange($request);
 
-        $visits = Visit::whereBetween('created_at', [$start, $end])->get();
-        $totalVisits = $visits->count();
+        // 🔹 Busca visitas dentro do período e ordena por data (mais recentes primeiro)
+        $visitsQuery = Visit::whereBetween('created_at', [$start, $end])
+            ->orderBy('created_at', 'desc');
 
-        // Agrupa visitas por dia
-        $visitsGrouped = $visits
-            ->groupBy(fn($item) => $item->created_at->format('Y-m-d'))
+        // 🔹 Paginação (5 por página)
+        $visits = $visitsQuery->paginate(5);
+
+        // 🔹 Todas as visitas (para o gráfico e contagem)
+        $allVisits = Visit::whereBetween('created_at', [$start, $end])->get();
+
+        // 🔹 Remove duplicadas (mesmo IP + mesma página + mesmo dia)
+        $uniqueVisits = $allVisits->unique(function ($v) {
+            return $v->ip . '|' . $v->page . '|' . $v->created_at->format('Y-m-d');
+        });
+
+        $totalVisits = $uniqueVisits->count();
+
+        // 🔹 Agrupa visitas únicas por dia (para o gráfico)
+        $visitsGrouped = $uniqueVisits
+            ->groupBy(fn($v) => $v->created_at->format('Y-m-d'))
             ->map->count()
             ->sortKeys();
 
         $visitsByDay = $visitsGrouped->mapWithKeys(
-            fn($count, $date) =>
-            [Carbon::parse($date)->format('d/m') => $count]
+            fn($count, $date) => [Carbon::parse($date)->format('d/m') => $count]
         );
 
         return view('admin.reports.visits', [
@@ -227,8 +240,10 @@ class ReportController extends Controller
             'endDate'     => $end->toDateString(),
             'totalVisits' => $totalVisits,
             'visitsByDay' => $visitsByDay,
+            'visits'      => $visits, // 👈 usado na tabela com paginação
         ]);
     }
+
 
     /**
      * Exportar PDF de Visitas

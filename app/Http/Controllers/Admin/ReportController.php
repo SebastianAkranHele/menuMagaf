@@ -227,6 +227,7 @@ class ReportController extends Controller
             'endDate'     => $end->toDateString(),
             'totalVisits' => $totalVisits,
             'visitsByDay' => $visitsByDay,
+            'visits'      => $visits, // 👈 adiciona isto
         ]);
     }
 

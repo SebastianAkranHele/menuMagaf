@@ -36,8 +36,44 @@
     </a>
 </div>
 
+{{-- Gráfico --}}
 <div class="graph-card" style="margin-top: 20px;">
     <canvas id="visitsReportChart" height="120"></canvas>
+</div>
+
+{{-- Tabela Detalhada --}}
+<div class="table-responsive" style="margin-top: 40px;">
+    <h3>Detalhes das Visitas</h3>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Data</th>
+                <th>Hora</th>
+                <th>IP</th>
+                <th>Página Visitada</th>
+                <th>Dispositivo / Navegador</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($visits as $v)
+                <tr>
+                    <td>{{ $v->id }}</td>
+                    <td>{{ $v->created_at->format('d/m/Y') }}</td>
+                    <td>{{ $v->created_at->format('H:i:s') }}</td>
+                    <td>{{ $v->ip ?? 'N/A' }}</td>
+                    <td>{{ $v->page ?? 'N/A' }}</td>
+                    <td style="max-width: 300px; white-space: normal;">
+                        {{ Str::limit($v->user_agent ?? 'N/A', 200) }}
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="text-center">Nenhuma visita encontrada neste período.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

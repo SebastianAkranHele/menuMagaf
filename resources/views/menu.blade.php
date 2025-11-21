@@ -7,13 +7,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Menu - Garrafeira das 5 Curvas</title>
 
-      {{-- Atualização automática opcional --}}
     @hasSection('auto-refresh')
         <meta http-equiv="refresh" content="@yield('auto-refresh', 30)">
     @endif
 
     @vite(['resources/css/menu.css', 'resources/css/app.css', 'resources/js/menu.js', 'resources/js/app.js'])
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
@@ -33,14 +31,13 @@
 
         {{-- Main --}}
         <main class="menu-container">
-
             {{-- Hero --}}
             <section class="menu-hero">
                 <h2>Cardápio Completo</h2>
                 <p>Descubra nossas especialidades</p>
             </section>
 
-            {{-- Filtros de Categoria --}}
+            {{-- Filtros --}}
             <div class="category-filters">
                 <button class="category-filter active" data-category="all">Todos</button>
                 @foreach ($categories as $category)
@@ -52,16 +49,16 @@
             <section class="menu-items">
                 @foreach ($products as $product)
                     <div class="menu-item"
-                         data-id="{{ $product->id }}"
-                         data-title="{{ $product->name }}"
-                         data-category="{{ $product->category->name }}"
-                         data-description="{{ $product->description }}"
-                         data-price="{{ $product->price }}"
-                         data-image="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/300x200?text=Sem+Imagem' }}">
+                        data-id="{{ $product->id }}"
+                        data-title="{{ $product->name }}"
+                        data-category="{{ $product->category->name }}"
+                        data-description="{{ $product->description }}"
+                        data-price="{{ $product->price }}"
+                        data-image="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/300x200?text=Sem+Imagem' }}">
 
                         <div class="item-image">
                             <img src="{{ $product->image ? asset('storage/' . $product->image) : 'https://via.placeholder.com/300x200?text=Sem+Imagem' }}"
-                                 alt="{{ $product->name }}">
+                                alt="{{ $product->name }}">
                         </div>
 
                         <div class="item-info">
@@ -86,7 +83,7 @@
         </main>
 
         {{-- Carrinho Flutuante --}}
-        <div class="floating-cart" id="floatingCart">
+        <div class="floating-cart" id="floatingCart" style="right: 20px;">
             <i class="fas fa-shopping-cart"></i>
             <span class="cart-count">0</span>
         </div>
@@ -149,9 +146,103 @@
         </footer>
     </div>
 
+    {{-- 💬 Botão Flutuante do Chat --}}
+    <button id="open-chatbot" class="btn btn-primary shadow"
+        style="position: fixed; bottom: 20px; left: 20px; border-radius: 50%;
+               width: 60px; height: 60px; font-size: 26px; display: flex;
+               align-items: center; justify-content: center; z-index: 999;">
+        <i class="fas fa-comment-dots"></i>
+    </button>
+
+    {{-- Janela Flutuante do Chatbot --}}
+    <div id="chatWindow"
+         style="position: fixed; bottom: 90px; left: 20px; width: 320px; background: white;
+                border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                overflow: hidden; display: none; z-index: 1000;">
+        <div style="background-color: #0d6efd; color: white; padding: 10px 15px;
+                    display: flex; justify-content: space-between; align-items: center;">
+            <strong>🤖 Assistente</strong>
+            <button id="closeChat"
+                    style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">×</button>
+        </div>
+
+        <div id="chat-box"
+             style="height: 300px; overflow-y: auto; background: #f8f9fa; padding: 10px;">
+            <div class="text-muted text-center small">Olá 👋! Posso te ajudar com os produtos do menu. 🍷</div>
+        </div>
+
+        <form id="chat-form" style="padding: 10px; border-top: 1px solid #ddd; background: #fff;">
+            <div style="display: flex; gap: 5px;">
+                <input type="text" id="user-input" class="form-control"
+                       placeholder="Escreve tua pergunta..." required>
+                <button class="btn btn-primary" type="submit">Enviar</button>
+            </div>
+        </form>
+    </div>
+
+    {{-- Scripts --}}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => loadMenuData());
+    const openChat = document.getElementById('open-chatbot');
+    const chatWindow = document.getElementById('chatWindow');
+    const closeChat = document.getElementById('closeChat');
+    const chatForm = document.getElementById('chat-form');
+    const chatBox = document.getElementById('chat-box');
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    const chatbotUrl = "{{ url('/chatbot') }}";
+
+    // Abrir e fechar chat
+    openChat.addEventListener('click', () => {
+        chatWindow.style.display = 'block';
+        openChat.style.display = 'none';
+    });
+
+    closeChat.addEventListener('click', () => {
+        chatWindow.style.display = 'none';
+        openChat.style.display = 'flex';
+    });
+
+    // Envio de mensagem
+    chatForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const input = document.getElementById('user-input');
+        const userMessage = input.value.trim();
+        if (!userMessage) return;
+
+        chatBox.innerHTML += `<div class="text-end mb-2"><span class="badge bg-primary p-2">${userMessage}</span></div>`;
+        input.value = '';
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+            const response = await fetch(chatbotUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ message: userMessage })
+            });
+
+            const data = await response.json();
+            let botMsg = data.message || "Desculpe, ocorreu um erro.";
+
+            botMsg = botMsg.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+
+            chatBox.innerHTML += `<div class="text-start mt-2"><span class="badge bg-light text-dark p-2" style="white-space: pre-line;">${botMsg}</span></div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        } catch (error) {
+            chatBox.innerHTML += `<div class="text-start mt-2"><span class="badge bg-danger text-white p-2">Erro de conexão.</span></div>`;
+        }
+    });
+
+    // Inicializa menu
+    document.addEventListener('DOMContentLoaded', () => {
+        if(typeof loadMenuData === 'function') loadMenuData();
+    });
     </script>
+
 </body>
 </html>

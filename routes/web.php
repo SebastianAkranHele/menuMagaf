@@ -6,7 +6,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\HomeHeroController as AdminHomeHeroController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-
+use App\Http\Controllers\ChatbotController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -24,6 +24,9 @@ Route::get('/', [AdminHomeHeroController::class, 'publicHome'])->name('home');
 
 Route::get('/menu', [MenuController::class, 'index'])->name('menu');
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+Route::view('/chatbot', 'chatbot')->name('chatbot');
+Route::get('/chat', [ChatbotController::class, 'view'])->name('chat.view');
 
 
 

@@ -109,14 +109,12 @@ class ReportController extends Controller
         }
 
         // Produtos menos vendidos no período
-        // Produtos menos vendidos no período
         $leastSold = Product::withSum(['orders as qty_sold' => function ($query) use ($start, $end) {
             $query->whereBetween('orders.created_at', [$start, $end]);
         }], 'order_product.quantity')
             ->orderBy('qty_sold', 'asc')
             ->take(10)
             ->get();
-
 
         // Últimos pedidos
         $recentOrders = Order::latest()->take(10)->get();
@@ -145,7 +143,7 @@ class ReportController extends Controller
             'hours',
             'days',
             'dayCounts',
-            'leastSold', // corrigido aqui
+            'leastSold',
             'recentOrders',
             'frequentCustomers',
             'peakHour',
@@ -208,24 +206,19 @@ class ReportController extends Controller
     {
         [$start, $end] = $this->getDateRange($request);
 
-        // 🔹 Busca visitas dentro do período e ordena por data (mais recentes primeiro)
         $visitsQuery = Visit::whereBetween('created_at', [$start, $end])
             ->orderBy('created_at', 'desc');
 
-        // 🔹 Paginação (5 por página)
         $visits = $visitsQuery->paginate(5);
 
-        // 🔹 Todas as visitas (para o gráfico e contagem)
         $allVisits = Visit::whereBetween('created_at', [$start, $end])->get();
 
-        // 🔹 Remove duplicadas (mesmo IP + mesma página + mesmo dia)
         $uniqueVisits = $allVisits->unique(function ($v) {
             return $v->ip . '|' . $v->page . '|' . $v->created_at->format('Y-m-d');
         });
 
         $totalVisits = $uniqueVisits->count();
 
-        // 🔹 Agrupa visitas únicas por dia (para o gráfico)
         $visitsGrouped = $uniqueVisits
             ->groupBy(fn($v) => $v->created_at->format('Y-m-d'))
             ->map->count()
@@ -240,14 +233,9 @@ class ReportController extends Controller
             'endDate'     => $end->toDateString(),
             'totalVisits' => $totalVisits,
             'visitsByDay' => $visitsByDay,
-<<<<<<< HEAD
-            'visits'      => $visits, // 👈 usado na tabela com paginação
-=======
-            'visits'      => $visits, // 👈 adiciona isto
->>>>>>> main
+            'visits'      => $visits, // usado na tabela com paginação
         ]);
     }
-
 
     /**
      * Exportar PDF de Visitas
@@ -299,8 +287,9 @@ class ReportController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
-    /* Export PDF */
-
+    /**
+     * Export PDF geral de pedidos
+     */
     public function exportPdf(Request $request)
     {
         [$start, $end] = $this->getDateRange($request);
@@ -311,7 +300,6 @@ class ReportController extends Controller
         $totalRevenue = (clone $ordersQuery)->where('status', 'completed')->sum('total');
         $avgTicket    = $totalOrders > 0 ? round($totalRevenue / $totalOrders, 2) : 0;
 
-        // Top produtos
         $topProducts = Product::select(
             'products.id',
             'products.name',
@@ -326,7 +314,6 @@ class ReportController extends Controller
             ->limit(10)
             ->get();
 
-        // Produtos menos vendidos
         $leastSold = Product::withSum(['orders as qty_sold' => function ($query) use ($start, $end) {
             $query->whereBetween('orders.created_at', [$start, $end]);
         }], 'order_product.quantity')

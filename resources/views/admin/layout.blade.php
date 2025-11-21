@@ -38,21 +38,43 @@
     <div class="sidebar-overlay"></div>
 
     <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header text-center p-3 border-bottom">
-            <h2>Garrafeira Admin</h2>
-            <p class="text-muted">Menu Digital</p>
-        </div>
-        <ul class="sidebar-menu list-unstyled px-3 mt-3">
-            <li><a href="{{ route('admin.dashboard') }}" class="nav-link">📊 Dashboard</a></li>
-            <li><a href="{{ route('admin.home.index') }}" class="nav-link">🏠 Conteúdo da Home</a></li>
-            <li><a href="{{ route('admin.categories.index') }}" class="nav-link">📂 Categorias</a></li>
-            <li><a href="{{ route('admin.products.index') }}" class="nav-link">🍷 Produtos</a></li>
-            <li><a href="{{ route('admin.orders.index') }}" class="nav-link">🧾 Pedidos</a></li>
-            <li><a href="{{ route('admin.reports.index') }}" class="nav-link">📈 Relatórios</a></li>
-            <li><a href="{{ route('admin.qrcode.index') }}" class="nav-link">🔗 QR Code</a></li>
-        </ul>
+  <!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-header text-center p-3 border-bottom">
+        <h2>Garrafeira Admin</h2>
+        <p class="text-muted">Menu Digital</p>
     </div>
+    <ul class="sidebar-menu list-unstyled px-3 mt-3">
+        <li class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+            <a href="{{ route('admin.dashboard') }}" class="nav-link">📊 Dashboard</a>
+        </li>
+        <li class="{{ request()->routeIs('admin.home.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.home.index') }}" class="nav-link">🏠 Conteúdo da Home</a>
+        </li>
+        <li class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.categories.index') }}" class="nav-link">📂 Categorias</a>
+        </li>
+        <li class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.products.index') }}" class="nav-link">🍷 Produtos</a>
+        </li>
+        <li class="{{ request()->routeIs('admin.orders.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.orders.index') }}" class="nav-link">🧾 Pedidos</a>
+        </li>
+        <li class="{{ request()->routeIs('admin.clients.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.clients.index') }}" class="nav-link">👤 Clientes</a>
+        </li>
+        <li class="{{ request()->routeIs('admin.plans.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.plans.index') }}" class="nav-link">💳 Planos</a>
+        </li>
+        <li class="{{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.reports.index') }}" class="nav-link">📈 Relatórios</a>
+        </li>
+        <li class="{{ request()->routeIs('admin.qrcode.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.qrcode.index') }}" class="nav-link">🔗 QR Code</a>
+        </li>
+    </ul>
+</div>
+
 
     <!-- Main Content -->
     <div class="main-content">

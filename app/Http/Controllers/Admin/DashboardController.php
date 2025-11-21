@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Order;
-use App\Models\Visit; // <- modelo de visitas
+use App\Models\Visit;
+use App\Models\Client;
+use App\Models\Plan;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -19,8 +21,10 @@ class DashboardController extends Controller
         // =====================
         $totalProducts   = Product::count();
         $totalCategories = Category::count();
+        $totalClients    = Client::count();
+        $totalPlans      = Plan::count();
         $ordersToday     = Order::whereDate('created_at', Carbon::today())->count();
-        $totalVisits = Visit::whereDate('created_at', today())->count();// total de visitas registradas
+        $totalVisits     = Visit::whereDate('created_at', today())->count(); // total de visitas registradas
 
         // =====================
         // 2. Resumo de pedidos
@@ -46,7 +50,6 @@ class DashboardController extends Controller
         $categories = Category::with('products')->get();
         $ordersByCategoryLabels = $categories->pluck('name');
         $ordersByCategoryData = $categories->map(function ($cat) {
-            // contar quantos pedidos existem com produtos dessa categoria
             return Order::whereHas('products', function ($q) use ($cat) {
                 $q->where('category_id', $cat->id);
             })->count();
@@ -75,6 +78,8 @@ class DashboardController extends Controller
         return view('admin.dashboard', compact(
             'totalProducts',
             'totalCategories',
+            'totalClients',
+            'totalPlans',
             'ordersToday',
             'totalVisits',
             'ordersCompleted',

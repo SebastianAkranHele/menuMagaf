@@ -15,25 +15,31 @@
                 <p class="card-value">{{ $totalProducts ?? 0 }}</p>
             </a>
 
-            <a href="{{ route('admin.categories.index') }}"
-                class="card summary-card bg-dark-red text-decoration-none text-white">
+            <a href="{{ route('admin.categories.index') }}" class="card summary-card bg-dark-red text-decoration-none text-white">
                 <h3>Categorias</h3>
                 <p class="card-value">{{ $totalCategories ?? 0 }}</p>
             </a>
 
-            <a href="{{ route('admin.orders.index') }}"
-                class="card summary-card bg-bright-red text-decoration-none text-white">
+            <a href="{{ route('admin.clients.index') }}" class="card summary-card bg-bright-red text-decoration-none text-white">
+                <h3>Clientes</h3>
+                <p class="card-value">{{ $totalClients ?? 0 }}</p>
+            </a>
+
+            <a href="{{ route('admin.plans.index') }}" class="card summary-card bg-dark-red text-decoration-none text-white">
+                <h3>Planos</h3>
+                <p class="card-value">{{ $totalPlans ?? 0 }}</p>
+            </a>
+
+            <a href="{{ route('admin.orders.index') }}" class="card summary-card bg-bright-red text-decoration-none text-white">
                 <h3>Pedidos Hoje</h3>
                 <p class="card-value">{{ $ordersToday ?? 0 }}</p>
             </a>
 
-            <a href="{{ route('admin.reports.visits') }}"
-                class="card summary-card bg-dark-red text-decoration-none text-white">
+            <a href="{{ route('admin.reports.visits') }}" class="card summary-card bg-dark-red text-decoration-none text-white">
                 <h3>Visitas</h3>
                 <p class="card-value">{{ $totalVisits ?? 0 }}</p>
             </a>
         </div>
-
 
         <!-- Lista de Pedidos por Status -->
         <div class="orders-list">
@@ -103,17 +109,9 @@
             color: #fff;
         }
 
-        .bg-red {
-            background: #db0505;
-        }
-
-        .bg-dark-red {
-            background: #a73406;
-        }
-
-        .bg-bright-red {
-            background: #f00505;
-        }
+        .bg-red { background: #db0505; }
+        .bg-dark-red { background: #a73406; }
+        .bg-bright-red { background: #f00505; }
 
         .card-value {
             font-size: 2rem;
@@ -134,8 +132,7 @@
             border-collapse: collapse;
         }
 
-        .orders-table th,
-        .orders-table td {
+        .orders-table th, .orders-table td {
             padding: 0.75rem;
             text-align: left;
             border-bottom: 1px solid #eee;
@@ -147,20 +144,9 @@
             font-size: 0.9rem;
         }
 
-        .status.completed {
-            background: #28a745;
-            color: #fff;
-        }
-
-        .status.pending {
-            background: #ffc107;
-            color: #000;
-        }
-
-        .status.canceled {
-            background: #dc3545;
-            color: #fff;
-        }
+        .status.completed { background: #28a745; color: #fff; }
+        .status.pending { background: #ffc107; color: #000; }
+        .status.canceled { background: #dc3545; color: #fff; }
 
         /* Gráficos */
         .dashboard-graphs {
@@ -181,19 +167,12 @@
 
         /* Responsividade */
         @media (max-width: 1024px) {
-            .dashboard-cards .card {
-                flex: 1 1 calc(50% - 1rem);
-            }
-
-            .dashboard-graphs .graph-card {
-                flex: 1 1 100%;
-            }
+            .dashboard-cards .card { flex: 1 1 calc(50% - 1rem); }
+            .dashboard-graphs .graph-card { flex: 1 1 100%; }
         }
 
         @media (max-width: 600px) {
-            .dashboard-cards .card {
-                flex: 1 1 100%;
-            }
+            .dashboard-cards .card { flex: 1 1 100%; }
         }
     </style>
 
@@ -214,7 +193,6 @@
                 });
             @endif
 
-            // ===== Tooltip padrão para gráficos =====
             const tooltipOptions = {
                 enabled: true,
                 backgroundColor: '#db0505',
@@ -243,17 +221,8 @@
                 },
                 options: {
                     responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        },
-                        tooltip: tooltipOptions
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
+                    plugins: { legend: { position: 'top' }, tooltip: tooltipOptions },
+                    scales: { y: { beginAtZero: true } }
                 }
             });
 
@@ -270,17 +239,8 @@
                 },
                 options: {
                     responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: tooltipOptions
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
+                    plugins: { legend: { display: false }, tooltip: tooltipOptions },
+                    scales: { y: { beginAtZero: true } }
                 }
             });
 
@@ -297,12 +257,7 @@
                 },
                 options: {
                     responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        },
-                        tooltip: tooltipOptions
-                    }
+                    plugins: { legend: { position: 'bottom' }, tooltip: tooltipOptions }
                 }
             });
 
@@ -312,31 +267,24 @@
                 data: {
                     labels: @json($visitsHoursLabels ?? []),
                     datasets: [{
-                            label: 'Visitas',
-                            data: @json($visitsHoursData ?? []),
-                            borderColor: '#db0505',
-                            backgroundColor: 'rgba(219,5,5,0.2)',
-                            tension: 0.4,
-                            fill: true
-                        },
-                        {
-                            label: 'Pedidos',
-                            data: @json($ordersHoursData ?? []),
-                            borderColor: '#a73406',
-                            backgroundColor: 'rgba(167,52,6,0.2)',
-                            tension: 0.4,
-                            fill: true
-                        }
-                    ]
+                        label: 'Visitas',
+                        data: @json($visitsHoursData ?? []),
+                        borderColor: '#db0505',
+                        backgroundColor: 'rgba(219,5,5,0.2)',
+                        tension: 0.4,
+                        fill: true
+                    },{
+                        label: 'Pedidos',
+                        data: @json($ordersHoursData ?? []),
+                        borderColor: '#a73406',
+                        backgroundColor: 'rgba(167,52,6,0.2)',
+                        tension: 0.4,
+                        fill: true
+                    }]
                 },
                 options: {
                     responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        },
-                        tooltip: tooltipOptions
-                    }
+                    plugins: { legend: { position: 'top' }, tooltip: tooltipOptions }
                 }
             });
         });

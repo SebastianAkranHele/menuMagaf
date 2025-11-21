@@ -4,7 +4,7 @@ class AdminMenu {
     constructor() {
         this.sidebar = document.querySelector('.sidebar');
 
-        // Criar botão hamburger
+        // Botão Hamburger
         this.menuToggle = document.querySelector('.sidebar-toggle');
         if (!this.menuToggle) {
             this.menuToggle = document.createElement('button');
@@ -13,7 +13,7 @@ class AdminMenu {
             document.body.appendChild(this.menuToggle);
         }
 
-        // Criar overlay
+        // Overlay
         this.sidebarOverlay = document.querySelector('.sidebar-overlay');
         if (!this.sidebarOverlay) {
             this.sidebarOverlay = document.createElement('div');
@@ -21,7 +21,7 @@ class AdminMenu {
             document.body.appendChild(this.sidebarOverlay);
         }
 
-        // Criar botão de fechar dentro do sidebar
+        // Botão de fechar no sidebar
         this.sidebarClose = this.sidebar.querySelector('.sidebar-close');
         if (!this.sidebarClose) {
             this.sidebarClose = document.createElement('button');
@@ -47,14 +47,14 @@ class AdminMenu {
         this.sidebarClose.addEventListener('click', () => this.closeSidebar());
         this.sidebarOverlay.addEventListener('click', () => this.closeSidebar());
 
-        // Fechar ao clicar em links (mobile)
+        // Fechar ao clicar em links no mobile
         document.querySelectorAll('.sidebar-menu a').forEach(link => {
             link.addEventListener('click', () => {
                 if (window.innerWidth <= 1024) this.closeSidebar();
             });
         });
 
-        // ESC fecha
+        // ESC fecha o sidebar
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') this.closeSidebar();
         });
@@ -82,13 +82,13 @@ class AdminMenu {
 
     checkScreenSize() {
         if (window.innerWidth > 1024) {
-            // Desktop: sidebar sempre visível, sem overlay nem botão hamburger
+            // Desktop: sidebar sempre visível
             this.sidebar.classList.remove('active');
             this.sidebarOverlay.classList.remove('active');
             document.body.classList.remove('sidebar-open');
             this.menuToggle.style.display = 'none';
         } else {
-            // Mobile: sidebar fechada, botão hamburger visível
+            // Mobile: sidebar fechada, hamburger visível
             this.sidebar.classList.remove('active');
             this.sidebarOverlay.classList.remove('active');
             document.body.classList.remove('sidebar-open');
@@ -101,4 +101,3 @@ class AdminMenu {
 document.addEventListener('DOMContentLoaded', () => {
     new AdminMenu();
 });
-

@@ -9,12 +9,15 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\OrderExportController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ClientController;
+use App\Http\Controllers\Admin\PlanController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
+
     // ============================
     // Autenticação
     // ============================
-     Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AuthController::class, 'login'])->name('login.post');
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -22,6 +25,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Rotas protegidas
     // ============================
     Route::middleware(['admin.auth'])->group(function () {
+
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -51,6 +55,26 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
         // ============================
+        // Clientes
+        // ============================
+        Route::get('clients', [ClientController::class, 'index'])->name('clients.index');
+        Route::get('clients/create', [ClientController::class, 'create'])->name('clients.create');
+        Route::post('clients', [ClientController::class, 'store'])->name('clients.store');
+        Route::get('clients/{client}/edit', [ClientController::class, 'edit'])->name('clients.edit');
+        Route::put('clients/{client}', [ClientController::class, 'update'])->name('clients.update');
+        Route::delete('clients/{client}', [ClientController::class, 'destroy'])->name('clients.destroy');
+
+        // ============================
+        // Planos
+        // ============================
+        Route::get('plans', [PlanController::class, 'index'])->name('plans.index');
+        Route::get('plans/create', [PlanController::class, 'create'])->name('plans.create');
+        Route::post('plans', [PlanController::class, 'store'])->name('plans.store');
+        Route::get('plans/{plan}/edit', [PlanController::class, 'edit'])->name('plans.edit');
+        Route::put('plans/{plan}', [PlanController::class, 'update'])->name('plans.update');
+        Route::delete('plans/{plan}', [PlanController::class, 'destroy'])->name('plans.destroy');
+
+        // ============================
         // Pedidos
         // ============================
         Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
@@ -59,7 +83,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('orders/{order}/complete', [OrderController::class, 'complete'])->name('orders.complete');
         Route::post('orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
         Route::post('orders/{order}/restore-pending', [OrderController::class, 'restorePending'])->name('orders.restorePending');
-
         Route::delete('orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
 
         // ============================
@@ -93,25 +116,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('/export/csv', [ReportController::class, 'exportCsv'])->name('export.csv');
             Route::get('/export/pdf', [ReportController::class, 'exportPdf'])->name('export.pdf');
 
-            // Exportar PDF de um pedido específico
-            Route::get('/export/pdf/{order}', [ReportController::class, 'exportSinglePdf'])
-                ->name('export.pdf.single');
-
-            // Opcional: exportar Excel ou CSV de um pedido específico
-            Route::get('/export/excel/{order}', [ReportController::class, 'exportSingleExcel'])
-                ->name('export.excel.single');
-
-            Route::get('/export/csv/{order}', [ReportController::class, 'exportSingleCsv'])
-                ->name('export.csv.single');
+            Route::get('/export/pdf/{order}', [ReportController::class, 'exportSinglePdf'])->name('export.pdf.single');
+            Route::get('/export/excel/{order}', [ReportController::class, 'exportSingleExcel'])->name('export.excel.single');
+            Route::get('/export/csv/{order}', [ReportController::class, 'exportSingleCsv'])->name('export.csv.single');
 
             // Relatório de visitas
             Route::get('/visits', [ReportController::class, 'visits'])->name('visits');
-Route::get('/visits/pdf', [ReportController::class, 'exportVisitsPdf'])->name('visits.pdf');
-Route::get('/visits/csv', [ReportController::class, 'exportVisitsCsv'])->name('visits.csv');
-
+            Route::get('/visits/pdf', [ReportController::class, 'exportVisitsPdf'])->name('visits.pdf');
+            Route::get('/visits/csv', [ReportController::class, 'exportVisitsCsv'])->name('visits.csv');
         });
-        /* Codigo QR */
-        Route::get('qrcode', [App\Http\Controllers\Admin\QrCodeController::class, 'index'])
-            ->name('qrcode.index');
+
+        // ============================
+        // Código QR
+        // ============================
+        Route::get('qrcode', [App\Http\Controllers\Admin\QrCodeController::class, 'index'])->name('qrcode.index');
     });
+
 });

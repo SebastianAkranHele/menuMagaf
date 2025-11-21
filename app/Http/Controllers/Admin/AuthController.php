@@ -12,9 +12,9 @@ class AuthController extends Controller
     public function showLoginForm()
     {
         // Impedir acesso direto sem código
-        if (!Session::get('admin_access_granted')) {
-            abort(403, 'Acesso não autorizado.');
-        }
+        //if (!Session::get('admin_access_granted')) {
+            //abort(403, 'Acesso não autorizado.');
+        //}
 
         return view('admin.auth.login');
     }

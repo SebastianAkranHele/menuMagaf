@@ -86,28 +86,15 @@
                         </a>
                     @endforeach
 
-                    <!-- 🔹 Novo botão Área Administrativa -->
-                    <button id="btnAdminAccess" class="social-link admin-color">
+                    <!-- 🔹 Botão Área Administrativa direto, abre em nova aba -->
+                    <a href="{{ url('/admin/login') }}" class="social-link admin-color" target="_blank">
                         <i class="fas fa-user-shield"></i>
                         <span>Área Administrativa</span>
-                    </button>
+                    </a>
+
                 </div>
             </section>
         </main>
-
-
-        <!-- Modal para código de acesso -->
-        <div id="adminAccessModal" class="modal hidden">
-            <div class="modal-content">
-                <h2 style="color: black; font-weight: bold;">Digite o código de acesso</h2>
-                <input type="password" id="adminCode" placeholder="Código" class="input-code">
-                <div class="modal-actions">
-                    <button id="verifyCodeBtn" class="btn-confirm">Entrar</button>
-                    <button id="closeModalBtn" class="btn-cancel">Cancelar</button>
-                </div>
-                <p id="errorMsg" class="error-msg hidden">Código incorreto!</p>
-            </div>
-        </div>
 
         <footer>
             <p>{{ $hero->footer_text ?? 'Magaf ' . date('Y') . ' - Todos os direitos reservados' }}</p>

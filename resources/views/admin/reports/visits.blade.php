@@ -49,11 +49,19 @@
     <canvas id="visitsReportChart" height="120"></canvas>
 </div>
 
+<<<<<<< HEAD
 {{-- Tabela de Detalhes das Visitas --}}
 <div class="table-responsive" style="margin-top: 30px;">
     <h5 style="margin-bottom: 15px;">Detalhes das Visitas</h5>
     <table class="table table-bordered table-striped align-middle">
         <thead class="table-light">
+=======
+{{-- Tabela Detalhada --}}
+<div class="table-responsive" style="margin-top: 40px;">
+    <h3>Detalhes das Visitas</h3>
+    <table class="table table-bordered table-striped">
+        <thead>
+>>>>>>> main
             <tr>
                 <th>#</th>
                 <th>Data</th>
@@ -64,6 +72,7 @@
             </tr>
         </thead>
         <tbody>
+<<<<<<< HEAD
             @php use Illuminate\Support\Str; @endphp
             @forelse($visits as $visit)
                 <tr>
@@ -74,17 +83,33 @@
                     <td>{{ $visit->page ? ucfirst(str_replace(['-', '_'], ' ', $visit->page)) : '—' }}</td>
                     <td title="{{ $visit->user_agent }}">
                         {{ Str::limit($visit->user_agent, 60) }}
+=======
+            @forelse($visits as $v)
+                <tr>
+                    <td>{{ $v->id }}</td>
+                    <td>{{ $v->created_at->format('d/m/Y') }}</td>
+                    <td>{{ $v->created_at->format('H:i:s') }}</td>
+                    <td>{{ $v->ip ?? 'N/A' }}</td>
+                    <td>{{ $v->page ?? 'N/A' }}</td>
+                    <td style="max-width: 300px; white-space: normal;">
+                        {{ Str::limit($v->user_agent ?? 'N/A', 200) }}
+>>>>>>> main
                     </td>
                 </tr>
             @empty
                 <tr>
+<<<<<<< HEAD
                     <td colspan="6" class="text-center text-muted" style="padding: 15px;">
                         Nenhuma visita encontrada neste período.
                     </td>
+=======
+                    <td colspan="6" class="text-center">Nenhuma visita encontrada neste período.</td>
+>>>>>>> main
                 </tr>
             @endforelse
         </tbody>
     </table>
+<<<<<<< HEAD
 
     {{-- 🔹 Paginação --}}
 <div class="d-flex justify-content-center align-items-center mt-3">
@@ -115,6 +140,10 @@
 </div>
 
 {{-- Gráfico JS --}}
+=======
+</div>
+
+>>>>>>> main
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {

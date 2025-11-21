@@ -240,7 +240,11 @@ class ReportController extends Controller
             'endDate'     => $end->toDateString(),
             'totalVisits' => $totalVisits,
             'visitsByDay' => $visitsByDay,
+<<<<<<< HEAD
             'visits'      => $visits, // 👈 usado na tabela com paginação
+=======
+            'visits'      => $visits, // 👈 adiciona isto
+>>>>>>> main
         ]);
     }
 

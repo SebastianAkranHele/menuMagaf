@@ -22,4 +22,8 @@ class Category extends Model
     {
         return $this->hasManyThrough(Order::class, Product::class);
     }
+    public function client()
+{
+    return $this->belongsTo(Client::class);
+}
 }

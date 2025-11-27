@@ -48,4 +48,9 @@ class Product extends Model
     {
         return $this->stock > 0;
     }
+
+    public function client()
+{
+    return $this->belongsTo(Client::class);
+}
 }

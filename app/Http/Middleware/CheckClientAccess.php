@@ -16,7 +16,7 @@ class CheckClientAccess
         $client = Auth::guard('client')->user(); // guard do cliente
 
         if (!$client || !$client->active) {
-            return redirect()->route('client.login')->with('error', 'Você precisa fazer login.');
+            return redirect()->route('client.auth.login')->with('error', 'Você precisa fazer login.');
         }
 
         // Define permissões dinamicamente
